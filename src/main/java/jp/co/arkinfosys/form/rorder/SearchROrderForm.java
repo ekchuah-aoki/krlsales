@@ -143,5 +143,11 @@ public class SearchROrderForm extends AbstractSearchForm<List<Object>> {
 	 * 仕入先名
 	 */
 	public String supplierName;
+	
+	/**
+	 * 初期表示の際、検索実行するかフラグ
+	 */
+	public boolean initSearch=false;
+	
 
 }

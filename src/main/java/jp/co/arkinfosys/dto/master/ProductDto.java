@@ -3,6 +3,10 @@
  */
 package jp.co.arkinfosys.dto.master;
 
+import java.util.List;
+
+import jp.co.arkinfosys.dto.StockInfoDto;
+
 /**
  * 商品マスタ情報を管理するDTOクラスです.
  *
@@ -213,6 +217,9 @@ public class ProductDto implements MasterEditDto {
 	 * 数量割引IDが変更されているか否か
 	 */
 	public boolean discountIdChanged;
+	
+	// 在庫情報 AOKI
+	public List<StockInfoDto> stokInfoList;	
 
 	/**
 	 * 商品コードを取得します.

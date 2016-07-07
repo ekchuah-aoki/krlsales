@@ -4,18 +4,20 @@
 package jp.co.arkinfosys.action.ajax.dialog;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.seasar.struts.annotation.ActionForm;
+import org.seasar.struts.annotation.Execute;
+import org.seasar.struts.util.ResponseUtil;
+
+import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.dto.StockInfoDto;
 import jp.co.arkinfosys.form.ajax.dialog.ShowStockInfoDialogForm;
 import jp.co.arkinfosys.service.ProductStockService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 import net.arnx.jsonic.JSON;
-
-import org.seasar.struts.annotation.ActionForm;
-import org.seasar.struts.annotation.Execute;
-import org.seasar.struts.util.ResponseUtil;
 
 /**
  * 商品在庫情報ダイアログの表示処理アクションクラスです.
@@ -45,18 +47,32 @@ public class ShowStockInfoDialogAction extends AbstractDialogAction {
 	 */
 	@Override
 	protected void createList() throws ServiceException {
+
 		this.showStockInfoDialogForm.stockInfoDto = this.productStockService
 				.calcStockQuantityByProductCode(this.showStockInfoDialogForm.productCode);
+		
+		//倉庫別（棚別）在庫情報  AOKI
+		//在庫管理区区分が「在庫管理する」の場合、のみ
+		if( CategoryTrns.PRODUCT_STOCK_CTL_YES.equals(this.showStockInfoDialogForm.stockInfoDto.stockCtlCategory)){ // 在庫管理区分
+			this.showStockInfoDialogForm.stockInfoDtoList = this.productStockService
+					.calcStockRackQuantityByProductCode(this.showStockInfoDialogForm.productCode,false);
+		}
+		
 		if (this.showStockInfoDialogForm.stockInfoDto.productCode != null
 				&& this.showStockInfoDialogForm.stockInfoDto.productName != null) {
+			
 			this.showStockInfoDialogForm.rorderRestDetailList = this.productStockService
 					.findRorderRestDetailByProductCode(showStockInfoDialogForm.productCode);
+			
 			this.showStockInfoDialogForm.porderRestDetailList = this.productStockService
 					.findPorderRestDetailByProductCode(showStockInfoDialogForm.productCode);
+			
 			this.showStockInfoDialogForm.entrustPorderRestDetailList = this.productStockService
 					.findEntrustPorderRestDetailByProductCode(showStockInfoDialogForm.productCode);
+			
 			this.showStockInfoDialogForm.entrustStockDetailList = this.productStockService
 					.findEntrustStockDetailByProductCode(showStockInfoDialogForm.productCode);
+			
 		}
 	}
 
@@ -109,9 +125,32 @@ public class ShowStockInfoDialogAction extends AbstractDialogAction {
 	@Execute(validator = false)
 	public String calcStock() throws Exception {
 		try {
-			StockInfoDto stockInfoDto = this.productStockService
-					.calcStockQuantityByProductCode(showStockInfoDialogForm.productCode);
 
+			//AOKI棚番号指定がない場合は、今まで通り
+			StockInfoDto stockInfoDto = null;
+			if( showStockInfoDialogForm.rackCode == null){
+				stockInfoDto = this.productStockService
+						.calcStockQuantityByProductCode(showStockInfoDialogForm.productCode);
+				
+			}else{
+				List<StockInfoDto> stokList = this.productStockService
+						.calcStockRackQuantityByProductCode(showStockInfoDialogForm.productCode,false);
+				
+				//該当する棚番号の在庫情報を返す
+				//倉庫別在庫がない場合は、今まで通り
+				if( stokList.size()==0){
+					stockInfoDto = this.productStockService
+							.calcStockQuantityByProductCode(showStockInfoDialogForm.productCode);
+				}else{
+					for(StockInfoDto stok : stokList){
+						if( stok.rackCode.equals(showStockInfoDialogForm.rackCode)){
+							stockInfoDto = stok;
+							break;
+						}
+					}
+				}
+			}
+			
 			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();
 			map.put(ShowStockInfoDialogAction.Param.PRODUCT_CODE,
 					(stockInfoDto.productCode == null ? ""

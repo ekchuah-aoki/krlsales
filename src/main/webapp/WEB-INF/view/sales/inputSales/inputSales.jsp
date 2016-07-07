@@ -1139,10 +1139,11 @@
 		}
 	}
 	// DBからの商品情報の設定
-	function setProductInfosByDB( index, value ){
+	function setProductInfosByDB( index, value){
 
 		var test;
 		for(var i in ProductInfosIDList){
+			
 			$("#salesLineList\\["+index+"\\]\\."+ ProductInfosIDList[i]).attr("value",value[ProductInfosDBList[i]]);
 			test = test + "\n" + ProductInfosIDList[i] + ":" + value[ProductInfosDBList[i]];
 		}
@@ -1177,7 +1178,7 @@
 
 
 	// 商品検索
-	function searchProductCode(index) {
+	function searchProductCode(index, notOverwriteRack) {
 
 		var map = new Object();
 		if(jQuery.trim($("#salesLineList\\["+index+"\\]\\.productCode").val()) == "") {
@@ -1196,7 +1197,16 @@
 						alert('<bean:message key="errors.notExist" arg0="商品コード" />');
 					} else {
 						var value = eval("(" + data + ")");
-						setProductInfosByDB( index, value );
+						
+						//AOKI
+						if( notOverwriteRack ){
+							var rackCode = $("#salesLineList\\["+index+"\\]\\.rackCodeSrc").val();
+							if( rackCode && rackCode!=""){
+								value["rackCode"] = rackCode;
+							}
+						}
+						
+						setProductInfosByDB( index, value);
 						// 在庫情報を検索してmapに設定する
 						searchProductStock(value);
 						// 数量が入っていたらまとめ買い値引きを実施
@@ -1248,7 +1258,7 @@
 		}
 		setProductInfosByDB(index, map);
 //		setProductInfo(index, map);
-		searchProductCode(index);
+		searchProductCode(index, true);
 		// 在庫情報を検索してmapに設定する
 		searchProductStock(map);
 
@@ -1292,6 +1302,9 @@
 	function searchProductStock(map){
 		var data = new Object();
 		data["productCode"] = map["productCode"];
+		data["rackCode"] = map["rackCode"]; //AOKI
+		
+		//AOKI nullを渡しているので、在庫数は戻ってこない。なんで、nullを渡しているの？
 		asyncRequest(
 			contextRoot + "/ajax/dialog/showStockInfoDialog/calcStock",
 			null,

@@ -78,4 +78,10 @@ public class OutputStockListFormDto implements Serializable {
 	 * 検索結果リスト
 	 */
 	public List<OutputStockListDto> searchResultList;
+	
+	/**
+	 * 出力方法
+	 */
+	public String radioOutType;
+	
 }

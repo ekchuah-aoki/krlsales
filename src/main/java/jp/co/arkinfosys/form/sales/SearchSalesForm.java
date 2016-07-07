@@ -161,4 +161,30 @@ public class SearchSalesForm extends AbstractSearchForm<List<Object>> {
 	 */
 	public List<LabelValueBean> salesCmCategoryList;
 
+	/**
+	 * 初期表示の際、検索実行するかフラグ
+	 */
+	public boolean initSearch=false;
+	
+	/**
+	 * 合計 粗利
+	 */
+	public String gmTotal="1000";
+	/**
+	 * 合計 粗利益
+	 */
+	public String gmTotalPer;
+	/**
+	 * 合計 金額合計
+	 */
+	public String priceTotal;
+	/**
+	 * 合計 消費税
+	 */
+	public String ctaxPriceTotal;
+	/**
+	 * 合計 総合計
+	 */
+	public String total;
+	
 }

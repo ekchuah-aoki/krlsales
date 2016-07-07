@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.dto.StockInfoDto;
 import jp.co.arkinfosys.entity.join.EntrustPorderRestDetail;
 import jp.co.arkinfosys.entity.join.EntrustStockDetail;
@@ -39,6 +40,12 @@ public class DispProductStockListAjaxAction extends CommonAjaxResources {
 	 */
 	public StockInfoDto stockInfoDto;
 
+	/**
+	 * 棚別在庫数情報 AOKI
+	 */
+	public List<StockInfoDto> stockInfoDtoList;
+	
+	
 	/**
 	 * 受注残明細
 	 */
@@ -74,8 +81,16 @@ public class DispProductStockListAjaxAction extends CommonAjaxResources {
 	@Execute(validator = false)
 	public String search() throws Exception {
 		try {
+			
+			//AOKI 棚別在庫に変更
 			this.stockInfoDto = this.productStockService
 					.calcStockQuantityByProductCode(dispProductStockForm.productCode);
+			
+			//AOKI 在庫管理する商品の場合、棚別在庫情報の取得
+			if( CategoryTrns.PRODUCT_STOCK_CTL_YES.equals(this.stockInfoDto.stockCtlCategory)){ // 在庫管理区分
+				this.stockInfoDtoList = this.productStockService
+						.calcStockRackQuantityByProductCode(dispProductStockForm.productCode,false);
+			}
 			// 該当がないのでエラーにする
 			if (this.stockInfoDto.productCode==null || this.stockInfoDto.productName==null) {
 				super.messages.add(ActionMessages.GLOBAL_MESSAGE,new ActionMessage("errors.dispProductPrice.none.productCode"));

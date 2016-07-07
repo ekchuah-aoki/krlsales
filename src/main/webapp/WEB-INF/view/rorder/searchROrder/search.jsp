@@ -22,6 +22,11 @@ function init(){
 
 	$("#customerCode").attr("maxlength", <%=Constants.CODE_SIZE.CUSTOMER%>);	//顧客コードの文字数制限10桁
 
+	//初期表示時に検索を行う
+	if(${initSearch}){
+		onF2();
+	}
+	
 }
 
 // 顧客検索

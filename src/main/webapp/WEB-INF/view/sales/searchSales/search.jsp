@@ -20,6 +20,25 @@
 			$("#salesSlipId").focus();
 
 			$("#customerCode").attr("maxlength", <%=Constants.CODE_SIZE.CUSTOMER%>);	//顧客コードの文字数制限10桁
+			
+			//初期表示時に検索を行う
+			if(${initSearch}){
+				onF2();
+			}
+			
+			// 粗利益 gmTotal
+			_after_load($("#gmTotal").val());
+			/*
+			// 粗利益率 gmTotalPer
+			applyNumeralStylesToObj(rateCategory,rateAlignment,$("#gmTotalPer"));
+			// 金額合計 priceTotal
+			applyNumeralStylesToObj($("#priceFractCategory").val(),priceAlignment,$("#priceTotal"));
+			// 消費税 ctaxPriceTotal
+			applyNumeralStylesToObj($("#taxFractCategory").val(),priceAlignment,$("#ctaxPriceTotal"));
+			// 伝票合計 total
+			applyNumeralStylesToObj($("#priceFractCategory").val(),priceAlignment,$("#total"));
+			*/
+			
 		}
 
 		// 顧客検索
@@ -505,6 +524,39 @@
 		<span id="listContainer">
 			<%@ include file="/WEB-INF/view/ajax/sales/searchSalesResultAjax/result.jsp" %>
 		</span>
+		
+		<div id="poSlipPriseInfos" class="information" style="margin-top: 10px;">
+        <div id="information" class="information" style="">
+			<table id="voucher_info" class="forms" summary="伝票情報" style="">
+				<tr>
+					<th style="height: 60px;" class="rd_top_left">粗利益</th>
+					<th>粗利益率</th>
+					<th>金額合計</th>
+					<th>消費税</th>
+					<th class="rd_top_right">伝票合計</th>
+				</tr>
+				<tr>
+					<td id="gmTotal" style="text-align: center; height: 100px;" class="BDCyen yen_value">
+						&nbsp;<c:out value="${f:h(gmTotal)}" />
+					</td>
+					<td id="gmTotalPer" style="text-align: center" class="numeral_commas">
+						&nbsp;<c:out value="${f:h(gmTotalPer)}" />
+					</td>
+					<td id="priceTotal" style="text-align: center" class="BDCyen yen_value">
+						&nbsp;<c:out value="${f:h(priceTotal)}" />
+					</td>
+					<td id="ctaxPriceTotal" style="text-align: center" class="BDCyen yen_value">
+						&nbsp;<c:out value="${f:h(ctaxPriceTotal)}" />
+					</td>
+					<td id="total" style="text-align: center" class="BDCyen yen_value">
+						&nbsp;<c:out value="${f:h(total)}" />
+					</td>
+				</tr>
+			</table>
+		</div>
+		</div>
+		
+		
 	</div>
 </body>
 </html>

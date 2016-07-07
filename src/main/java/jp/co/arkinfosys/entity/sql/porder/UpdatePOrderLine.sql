@@ -4,6 +4,7 @@ SET
 STATUS = /*status*/0,
 LINE_NO = /*lineNo*/,
 PRODUCT_CODE = /*productCode*/,
+RACK_CODE = /*rackCode*/,
 SUPPLIER_PCODE = /*supplierPcode*/,
 PRODUCT_ABSTRACT = /*productAbstract*/,
 QUANTITY = /*quantity*/,

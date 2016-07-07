@@ -42,6 +42,7 @@ public class RoSlipService extends AbstractSlipService<RoSlipTrn,ROrderSlipDto> 
 	 */
 	public static class Param {
 		private static final String PRODUCT_CODE = "productCode";
+		private static final String RACK_CODE = "rackCode";				//AOKI
 
 		// 受注伝票
 		public static final String RO_SLIP_ID = "roSlipId";
@@ -129,6 +130,22 @@ public class RoSlipService extends AbstractSlipService<RoSlipTrn,ROrderSlipDto> 
 
 		return this.selectBySqlFile(RoSlipTrn.class,
 				"rorder/FindRoSlipTrnBySlipId.sql", param).getSingleResult();
+	}
+
+	/**
+	 * 顧客番号を指定して、最新の受注伝票番号を取得します.
+	 * @param customerCode 顧客コード
+	 * @return 受注伝票情報エンティティ
+	 * @throws ServiceException
+	 */
+	public String getLastRoSlipId(String customerCode) throws ServiceException {
+
+		// SQLパラメータを構築する
+		Map<String, Object> param = super.createSqlParam();
+		param.put(RoSlipService.Param.CUSTOMER_CODE, customerCode);
+
+		return this.selectBySqlFile(String.class,
+				"rorder/FindLastRoSlipIdByCustomerCode.sql", param).getSingleResult();
 	}
 
 	/**
@@ -251,6 +268,51 @@ public class RoSlipService extends AbstractSlipService<RoSlipTrn,ROrderSlipDto> 
 		}
 	}
 
+	/**
+	 * 商品コード、棚番号を指定して、受注残数を取得します.
+	 * AOKI
+	 * @param productCode 商品コード
+	 * @param rackCode 棚番号
+	 * @return 受注残数
+	 * @throws ServiceException
+	 */
+	public int countRestQuantityByProductCode(String productCode, String rackCode)
+			throws ServiceException {
+		try {
+			Map<String, Object> params = super.createSqlParam();
+
+			// 商品コード
+			params.put(RoSlipService.Param.PRODUCT_CODE, productCode);
+			// 棚番号
+			params.put(RoSlipService.Param.RACK_CODE, rackCode);
+
+			// 指定商品コードの全親品番を取得する
+			List<ProductSetJoin> setProductList = productSetService.findProductSetByChildProductCode(productCode);
+
+			// 親品番を設定
+			List<String> setProductCode = null;
+			Iterator<ProductSetJoin> it = setProductList.iterator();
+			while (it.hasNext()) {
+				if (setProductCode==null) {
+					setProductCode = new ArrayList<String>();
+				}
+				ProductSetJoin psj = it.next();
+				setProductCode.add(psj.setProductCode);
+			}
+			params.put(ProductSetService.Param.SET_PRODUCT_CODE, setProductCode);
+
+			StockQuantity result = this.selectBySqlFile(StockQuantity.class,
+					"rorder/CountRestQuantityByProductCode.sql", params)
+					.getSingleResult();
+
+			if (result != null && result.quantity != null) {
+				return result.quantity.intValue();
+			}
+			return 0;
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
 	/**
 	 * 受注伝票番号を指定して、受注伝票情報を取得します.
 	 * @param id 受注伝票番号

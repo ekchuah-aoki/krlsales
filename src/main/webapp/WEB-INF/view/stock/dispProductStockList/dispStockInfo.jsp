@@ -35,22 +35,47 @@
 
 <table summary="在庫情報" style="width: 900px; margin-top: 20px;" class="forms detail_info">
 	<colgroup>
-		<col span="5" style="width: 20%">
+		<col span="7" style="width: 10%">
 	</colgroup>
 	<tr>
-		<th class="xl64 rd_top_left" style="height: 30px;">現在庫総数</th>
+		<th class=" rd_top_left" style="height: 30px">倉庫（棚）</th>
+		<th class="xl64" style="height: 30px">製造年月日</th>
+		<th class="xl64" style="height: 30px">現在庫総数</th>
 		<th class="xl64" style="height: 30px;">引当可能数</th>
 		<th class="xl64" style="height: 30px;">受注残数</th>
 		<th class="xl64" style="height: 30px;">発注残数</th>
 		<th class="xl64 rd_top_right" style="height: 30px;">委託残数</th>
 	</tr>
 	<tr>
+		<td style="text-align: right"></td>
+		<td style="text-align: right"></td>
 		<td style="text-align: right">${stockInfoDto.formattedCurrentTotalQuantity}</td>
 		<td style="text-align: right">${stockInfoDto.formattedPossibleDrawQuantity}</td>
 		<td style="text-align: right">${stockInfoDto.formattedRorderRestQuantity}</td>
 		<td style="text-align: right">${stockInfoDto.formattedPorderRestQuantity}</td>
 		<td style="text-align: right">${stockInfoDto.formattedEntrustRestQuantity}</td>
 	</tr>
+	<!-- AOKI -->
+	<c:forEach var="stok" items="${stockInfoDtoList}" varStatus="s">
+		<tr>
+		<td style="text-align: right"><span style="float:left">${stok.warehouseName}(${stok.rackCode})</span></td>
+		<td style="text-align: right">2016/01/02</td>
+		<td style="text-align: right">${stok.formattedCurrentTotalQuantity}</td>
+		<td style="text-align: right">${stok.formattedPossibleDrawQuantity}</td>
+		<td style="text-align: right">${stok.formattedRorderRestQuantity}</td>
+		<td style="text-align: right;background-color:gray"></td>
+		<td style="text-align: right;background-color:gray"></td>
+		</tr>
+		<tr>
+		<td style="text-align: right"></td>
+		<td style="text-align: right">2016/02/02</td>
+		<td style="text-align: right">10</td>
+		<td style="text-align: right">5</td>
+		<td style="text-align: right">0</td>
+		<td style="text-align: right;background-color:gray"></td>
+		<td style="text-align: right;background-color:gray"></td>
+		</tr>
+	</c:forEach>	
 </table>
 
 <table summary="受発注明細" style="width: 700px; border: none; table-layout: fixed; text-align: left; margin-top: 20px;">

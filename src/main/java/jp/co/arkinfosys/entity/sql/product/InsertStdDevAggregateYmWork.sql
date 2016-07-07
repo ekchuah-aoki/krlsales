@@ -2,6 +2,9 @@ INSERT INTO STDDEV_AGGREGATE_YM_WORK_/*$domainId*/ (
 	SESSION_ID,
 	YM,
 	PRODUCT_CODE,
+	/*IF outtypeRack != null*/
+	RACK_CODE,
+	/*END*/
 	QUANTITY
 )
 (
@@ -9,11 +12,17 @@ INSERT INTO STDDEV_AGGREGATE_YM_WORK_/*$domainId*/ (
 		/*sessionId*/ AS SESSION_ID,
 		W.YM,
 		A.PRODUCT_CODE,
+		/*IF outtypeRack != null*/
+		A.RACK_CODE,
+		/*END*/
 		0
 	FROM
 		STDDEV_YM_WORK_/*$domainId*/ W CROSS JOIN (
 			SELECT DISTINCT
 				P.PRODUCT_CODE
+				/*IF outtypeRack != null*/
+				,SL.RACK_CODE_SRC AS RACK_CODE
+				/*END*/
 			FROM
 				PRODUCT_MST_/*$domainId*/ P
 				INNER JOIN SALES_LINE_TRN_/*$domainId*/ SL ON P.PRODUCT_CODE = SL.PRODUCT_CODE

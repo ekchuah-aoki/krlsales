@@ -27,10 +27,17 @@ public class ShowStockInfoDialogForm {
 
 	public String productCode;
 
+	public String rackCode;	//AOKI
+
 	/**
 	 * 在庫数情報
 	 */
 	public StockInfoDto stockInfoDto;
+	
+	/**
+	 * 棚別在庫数情報
+	 */
+	public List<StockInfoDto> stockInfoDtoList;	//AOKI
 
 	/**
 	 * 受注残明細

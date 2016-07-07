@@ -398,6 +398,7 @@ public abstract class AbstractSlipEditAction<DTOCLASS extends AbstractSlipDto<LI
 		AbstractSlipEditForm<LINEDTOCLASS> form = this.getActionForm();
 		form.userDto = this.userDto;
 		form.mineDto = this.mineDto;
+		form.pbxDto = this.pbxDto;  //AOKI
 		form.taxRateService = this.taxRateService;
 	}
 

@@ -32,6 +32,14 @@ ProductParams.width = 800;
 ProductParams.height = 630;
 
 /**
+ * 商品検索画面2(棚番別在庫数表示版)のパラメータ
+ */
+var ProductStokParams = new Params();
+ProductStokParams.url = "/ajax/dialog/searchProductStokDialog";
+ProductStokParams.width = 800;
+ProductStokParams.height = 730;
+
+/**
  * 顧客検索画面のパラメータ
  */
 var CustomerParams = new Params();
@@ -366,6 +374,42 @@ function _selectSearchResultAjax(dialogId, radioId, dialogParams, keyName ) {
 			}
 	  	);
 	}
+
+	/**
+	 * AOKI 検索結果の選択処理
+	 * 項目値上書き機能あり
+	 * リンク押下で決定しダイアログを閉じる
+	 * @return
+	 */
+		function _selectLinkSearchResultAjax2(dialogId, selectVal, dialogParams, keyName, overwriteVale ) {
+		  	// 選択された項目に関する情報をハッシュで作成する
+		  	var selectValue = selectVal;
+		  	var func = window.dialogIdToFunc[dialogId];
+		  	var data = new Object();
+		  	data[ keyName ] = selectValue;
+
+		  	asyncRequest(
+		  		contextRoot + dialogParams.url + "/select",
+		  		data,
+				function(data) {
+				  	// ダイアログの選択処理関数を取得する
+		  			
+		  			if( overwriteVale ){
+		  				var wrkData = JSON.parse(data);
+		  				for(var key in overwriteVale){
+		  					wrkData[key]=overwriteVale[key];
+		  				}
+		  				data = JSON.stringify(wrkData);
+		  			}
+
+				  	if (func != null && func instanceof Function) {
+				  		// 呼び出し
+				  		func(dialogId, eval("(" + data + ")"));
+				  	}
+				}
+		  	);
+		}
+	
 /**
  * 検索結果の選択処理
  * @return
@@ -429,6 +473,15 @@ function _selectLinkSearchResult(dialogId, selectVal) {
 function _searchProduct(dialogId) {
 	var data = _createData(dialogId, $("#" + dialogId).find("input[type='text'], select"));
 	_search(ProductParams, dialogId, data);
+}
+/**
+ * 商品（棚番別在庫版）検索実行
+ *
+ * @return
+ */
+function _searchProductStok(dialogId) {
+	var data = _createData(dialogId, $("#" + dialogId).find("input[type='text'], select, input[type='hidden']"));
+	_search(ProductStokParams, dialogId, data);
 }
 
 /**
@@ -985,8 +1038,30 @@ function openSearchProductDialog(dialogId, endFunc, params) {
 	} else {
 		openParams = ProductParams;
 	}
+	
 	_openDialog(dialogId, endFunc, openParams);
 }
+
+/**
+ * 商品検索(棚番在庫数表示版)ダイアログを開く
+ *
+ * @param dialogId ダイアログID(画面内で一意であること)
+ * @param endFunc コールバック関数オブジェクト
+ * @param dialogParams (任意指定）
+ * @return
+ */
+function openSearchProductStokDialog(dialogId, zeroZaiko, endFunc, params) {
+	var openParams = null;
+	if (params) {
+		openParams = params;
+	} else {
+		openParams = ProductStokParams;
+	}
+	
+	var data = {"zeroZaiko":zeroZaiko};
+	_openDialog(dialogId, endFunc, openParams, data);
+}
+
 
 /**
  * 顧客検索ダイアログを開く
@@ -1359,6 +1434,8 @@ function openCopySlipDialog(menuId, dialogId, endFunc, params) {
 		if(slipSearchDiv.size() == 0) {
 			return;
 		}
+		
+		$("#" + this.id + "_rorderCondition.customerCode").val("aaaaaaaa");
 
 		// 表示
 		slipSearchDiv.show();

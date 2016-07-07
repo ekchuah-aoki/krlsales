@@ -414,11 +414,11 @@
 			}
 			args["productCode"] = $("#eadLineTrnDtoList\\["+index+"\\]\\.productCode").val();
 			// 商品コード変更？移動元棚番コード変更？
-			if(isProductChange) {
-				args["rackCode"] = "";
-			} else {
+			//if(isProductChange) {
+			//	args["rackCode"] = "";
+			//} else {
 				args["rackCode"] = $("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val();
-			}
+			//}
 			args["productCode"] = $("#eadLineTrnDtoList\\["+index+"\\]\\.productCode").val();
 			asyncRequest(
 				contextRoot + "/ajax/commonProduct/getProductInfos",
@@ -461,7 +461,9 @@
 						// 棚番
 						if(isProductChange) {
 							// 商品コード変更の場合のみ取得する
-							$("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val(value.rackCode);
+							if($("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val()==""){
+								$("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val(value.rackCode);
+							}
 						}
 						// 移動元在庫数表示
 						var quantity = _getNumStr($("#eadLineTrnDtoList\\["+index+"\\]\\.quantity").val());
@@ -521,7 +523,8 @@
 		// 商品検索
 		function openProductSearchDialog(event) {
 			// 商品検索ダイアログを開く
-			openSearchProductDialog(event.data.index, setProductInfoFromDialog );
+			openSearchProductStokDialog(event.data.index, "0", setProductInfoFromDialog );
+			//openSearchProductDialog(event.data.index, setProductInfoFromDialog );
 			// 商品コードを設定する
 			$("#"+event.data.index+"_productCode").val($("#eadLineTrnDtoList\\["+event.data.index+"\\]\\.productCode").val());
 			// セット分類を設定する
@@ -756,7 +759,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th><div class="col_title_right"><bean:message key='labels.reason'/></div></th><%// 理由 %>
+						<th><div class="col_title_right"><bean:message key='labels.containerNo'/></div></th><%// コンテナNo. %>
 						<td colspan="7"><html:text property="remarks" styleClass="c_referable" style="width: 700px;" tabindex="102" maxlength="120" /></td>
 					</tr>
 				</table>

@@ -346,11 +346,11 @@
 
 		// 商品コード変更
 		function changeProductCode(event) {
-			searchProductCode(event.data.index);
+			searchProductCode(event.data.index,true);
 		}
 
 		// 商品検索
-		function searchProductCode(index) {
+		function searchProductCode(index, changeMode) {
 			var map = new Object();
 			var lineNo = parseInt($("#eadLineTrnDtoList\\["+index+"\\]\\.lineNo").val());
 			var label = '<bean:message key="labels.productCode" />';
@@ -368,6 +368,7 @@
 			}
 			var data = new Object();
 			data["productCode"] = $("#eadLineTrnDtoList\\["+index+"\\]\\.productCode").val();
+			data["rackCode"] = $("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val();  //AOKI棚コード指定
 			asyncRequest(
 				contextRoot + "/ajax/commonProduct/getProductInfos",
 				data,
@@ -397,13 +398,23 @@
 						$("#eadLineTrnDtoList\\["+index+"\\]\\.stockCount").val(stockCount);
 						SetBigDecimalScale_Obj($("#eadLineTrnDtoList\\["+index+"\\]\\.stockCount"));
 						// 棚番
-						$("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val(value.rackCode);
+						//AOKI棚番は商品検索のものを使用する
+						//但し、空なら設定
+						if($("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val()==""){
+							$("#eadLineTrnDtoList\\["+index+"\\]\\.rackCode").val(value.rackCode);
+						}
 
 						// 商品備考
 						$("#eadLineTrnDtoList\\["+index+"\\]\\.productRemarks").val(value.remarks);
 
 						// 変更後在庫数
 						changeUpdateQuantity(index);
+
+						//在庫管理区分「在庫管理する」の場合、商品検索を表示する
+        				if( changeMode && value.stockCtlCategory == "<%=CategoryTrns.PRODUCT_STOCK_CTL_YES%>" ){
+        					openProductSearchDialogByIndex(index);
+        				}
+						
 					}
 				}
 			);
@@ -412,13 +423,25 @@
 		// 商品検索
 		function openProductSearchDialog(event) {
 			// 商品検索ダイアログを開く
-			openSearchProductDialog(event.data.index, setProductInfoFromDialog );
+			//AOKI
+			//openSearchProductDialog(event.data.index, setProductInfoFromDialog );
+			openSearchProductStokDialog(event.data.index, "1", setProductInfoFromDialog );
+			
 			// 商品コードを設定する
 			$("#"+event.data.index+"_productCode").val($("#eadLineTrnDtoList\\["+event.data.index+"\\]\\.productCode").val());
 			// セット分類を設定する
 			$("#"+event.data.index+"_setTypeCategory").val("${productSetSingle}");
 		}
 
+		// 商品検索
+		function openProductSearchDialogByIndex(index) {
+			var event = {"data":{index:index}};
+			
+			openProductSearchDialog(event);
+			
+		}
+		
+		
 		// 商品検索後の設定処理
 		function setProductInfoFromDialog(index, map) {
 			setProductInfo(index, map);
@@ -682,7 +705,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th><div class="col_title_right"><bean:message key='labels.reason'/></div></th><%// 理由 %>
+						<th><div class="col_title_right"><bean:message key='labels.containerNo'/></div></th><%// コンテナNo. %>
 						<td colspan="5"><html:text property="remarks" styleClass="c_referable" style="width: 550px;" tabindex="104" maxlength="120" /></td>
 						<th><div class="col_title_right"><bean:message key='labels.userName'/></div></th><%// 入力担当者 %>
 						<td>
@@ -781,8 +804,11 @@
 
 									<!-- 棚番 -->
 									<div class="box_1of1">
+										<html:text name="eadLineTrnDtoList" property="rackCode" indexed="true" styleId="eadLineTrnDtoList[${status.index}].rackCode" styleClass="c_disable" style="width: 85px; ime-mode: disabled;" tabindex="<%=String.valueOf(lineTab++) %>" maxlength="${code_size_rack}" readonly="true"/>
+										<!-- 
 										<html:text name="eadLineTrnDtoList" property="rackCode" indexed="true" styleId="eadLineTrnDtoList[${status.index}].rackCode" styleClass="c_referable" style="width: 85px; ime-mode: disabled;" tabindex="<%=String.valueOf(lineTab++) %>" maxlength="${code_size_rack}" />
 										<html:image styleId="rackCodeImg${status.index}" src='${f:url("/images/customize/btn_search.png")}' style="width: auto; vertical-align: middle; cursor: pointer;" tabindex="<%=String.valueOf(lineTab++) %>"/>
+										 -->
 									</div>
 									</td>
 

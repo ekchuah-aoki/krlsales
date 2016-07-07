@@ -27,12 +27,15 @@ import jp.co.arkinfosys.entity.join.PorderRestDetail;
 import jp.co.arkinfosys.entity.join.ProductJoin;
 import jp.co.arkinfosys.entity.join.ProductSetJoin;
 import jp.co.arkinfosys.entity.join.ProductStockJoin;
+import jp.co.arkinfosys.entity.join.RackJoin;
 import jp.co.arkinfosys.entity.join.RorderRestDetail;
 import jp.co.arkinfosys.entity.join.StockQuantity;
 import jp.co.arkinfosys.service.exception.ServiceException;
-
+import jp.co.arkinfosys.service.RackService;
 import org.seasar.framework.beans.util.Beans;
 import org.seasar.struts.util.MessageResourcesUtil;
+import org.seasar.framework.beans.util.BeanMap;
+
 
 /**
  * 商品在庫サービスクラスです.
@@ -79,6 +82,9 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 
 	@Resource
 	private YmService ymService;
+	
+	@Resource 
+	private RackService rackService;	//AOKI 
 
 	/**
 	 * 商品コードと棚番コードを指定して、前回の在庫締時点での自社倉庫における商品在庫数を返します.
@@ -437,9 +443,14 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 			param.put(Param.SET_TYPE_CATEGORY,
 					CategoryTrns.PRODUCT_SET_TYPE_SET);
 
+			//AOKI
 			return this.selectBySqlFile(ProductStockJoin.class,
-					"productstock/FindProductStockByYm.sql", param)
+					"productstock/FindProductRackStockByYm.sql", param)
 					.getResultList();
+
+			//return this.selectBySqlFile(ProductStockJoin.class,
+			//		"productstock/FindProductStockByYm.sql", param)
+			//		.getResultList();
 		} catch (ServiceException e) {
 			throw e;
 		} catch (Exception e) {
@@ -726,4 +737,254 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 			throw new ServiceException(e);
 		}
 	}
+	
+	/**
+	 * AOKI 商品コードを指定して、商品の倉庫別（棚）在庫数情報を返します.
+	 * セット商品
+	 * @param productCode 商品コード
+	 * @return 在庫数情報{@link StockInfoDto}
+	 * @throws ServiceException
+	 */
+	public List<StockInfoDto> calcStockRackQuantityByProductCode(String productCode, boolean zeroZaiko)
+			throws ServiceException {
+		List<StockInfoDto> resultList = new ArrayList<StockInfoDto>();
+		if (!StringUtil.hasLength(productCode)) {
+			return resultList;
+		}
+
+		//棚一覧を取得
+		List<RackJoin> rackList = this.rackService.findByCondition(new BeanMap(),RackService.Param.RACK_CODE, true);
+		
+		try {
+
+			// 商品情報を取得する
+			ProductJoin product = this.productService
+					.findById(productCode);
+			if (product == null) {
+				return resultList;
+			}
+
+
+
+			// 単品
+			
+			if (CategoryTrns.PRODUCT_SET_TYPE_SINGLE
+					.equals(product.setTypeCategory)) {
+
+				//単品の場合は、倉庫別に在庫数を取得
+				for(RackJoin rack : rackList){
+
+					StockInfoDto result = new StockInfoDto();
+
+					result.setQuantityFormatOptions(super.mineDto.productFractCategory, super.mineDto.numDecAlignment);
+
+					Beans.copy(product, result).execute();
+					Beans.copy(rack, result).execute();
+					
+					
+					// 自社倉庫への当月入出庫分
+					int currentMonthStock = this.eadService
+							.countUnclosedQuantityByProductCode(productCode, rack.rackCode);
+	
+					// 自社倉庫の前回締め時点での在庫数
+					int prevMonthStock = this
+							.countClosedQuantityByProductCode(productCode, rack.rackCode);
+	
+					//在庫０なので無視
+					if( currentMonthStock==0 && prevMonthStock==0 && !zeroZaiko){
+						continue;
+					}
+					
+					
+					// 現在庫総数
+					result.currentTotalQuantity = currentMonthStock
+							+ prevMonthStock;
+	
+					// 委託在庫数
+					result.entrustStockQuantity = this.eadService
+							.countEntrustQuantityByProductCode(productCode);
+	
+					// 受注残数
+					result.rorderRestQuantity = this.roSlipService
+							.countRestQuantityByProductCode(productCode, rack.rackCode);
+	
+					// 発注残数
+					result.porderRestQuantity = this.poSlipService
+							.countRestQuantityByProductCode(productCode, false);
+	
+					// 船便発注残数
+					result.porderRestQuantityShip = this.poSlipService
+							.countRestQuantityByProductCode(productCode,
+									CategoryTrns.TRANSPORT_CATEGORY_SHIP);
+	
+					// AIR便発注残数
+					result.porderRestQuantityAir = this.poSlipService
+							.countRestQuantityByProductCode(productCode,
+									CategoryTrns.TRANSPORT_CATEGORY_AIR);
+	
+					// 宅配便発注残数
+					result.porderRestQuantityDerivary = this.poSlipService
+							.countRestQuantityByProductCode(productCode,
+									CategoryTrns.TRANSPORT_CATEGORY_DELIVERY);
+	
+					// 委託残数
+					result.entrustRestQuantity = this.poSlipService
+							.countRestQuantityByProductCode(productCode, true);
+	
+					// 引当可能数
+					result.possibleDrawQuantity = result.currentTotalQuantity
+							- result.rorderRestQuantity;
+					
+
+					// 保有数
+					result.holdingStockQuantity = result.currentTotalQuantity
+							+ result.entrustStockQuantity + result.porderRestQuantity
+							+ result.entrustRestQuantity - result.rorderRestQuantity;
+					
+					resultList.add(result);
+					
+				}
+			}
+			// セット品
+			else if (CategoryTrns.PRODUCT_SET_TYPE_SET
+					.equals(product.setTypeCategory)) {
+				
+				StockInfoDto result = new StockInfoDto();
+
+				result.setQuantityFormatOptions(super.mineDto.productFractCategory, super.mineDto.numDecAlignment);
+
+				Beans.copy(product, result).execute();
+				
+				
+				// セット商品の内訳商品を全て取得する
+				List<ProductSetJoin> productSetList = this.productSetService
+						.findProductSetByProductCode(productCode);
+				if (productSetList != null && productSetList.size() > 0) {
+
+					String[] productCodeArray = new String[productSetList
+							.size()];
+					for (int i = 0; i < productSetList.size(); i++) {
+						productCodeArray[i] = productSetList.get(i).productCode;
+					}
+
+					// 各商品の自社倉庫への当月入出庫分
+					List<StockQuantity> stockQuantityList = this.eadService
+							.countUnclosedQuantityByProductCode(productCodeArray);
+					Map<String, BigDecimal> productQuantityMap = new HashMap<String, BigDecimal>();
+					for (StockQuantity stockQuantity : stockQuantityList) {
+						if (stockQuantity.quantity != null) {
+							productQuantityMap.put(stockQuantity.productCode,
+									stockQuantity.quantity);
+						}
+					}
+
+					// 各商品の自社倉庫の前回締め時点での在庫数
+					stockQuantityList = this
+							.countClosedQuantityByProductCode(productCodeArray);
+					for (StockQuantity stockQuantity : stockQuantityList) {
+						if (stockQuantity.quantity != null) {
+							BigDecimal dec = productQuantityMap
+									.get(stockQuantity.productCode);
+							if (dec != null) {
+								productQuantityMap.put(
+										stockQuantity.productCode, dec.add(
+												stockQuantity.quantity,
+												MathContext.UNLIMITED));
+								continue;
+							}
+							productQuantityMap.put(stockQuantity.productCode,
+									stockQuantity.quantity);
+						}
+					}
+
+					// 在庫数量をセット数で割った場合に、最も小さい値となる商品の値を採用
+					BigDecimal minQuantity = null;
+					for (ProductSetJoin productSet : productSetList) {
+						if (productQuantityMap
+								.containsKey(productSet.productCode)) {
+							BigDecimal temp = productQuantityMap.get(
+									productSet.productCode).divide(
+									productSet.quantity, RoundingMode.DOWN);
+							if (minQuantity == null) {
+								minQuantity = temp;
+								continue;
+							}
+
+							if (minQuantity.compareTo(temp) > 0) {
+								minQuantity = temp;
+							}
+							continue;
+						}
+						// 数量が存在しない商品があった時点で終了（セット品としての在庫が不成立）
+						minQuantity = new BigDecimal(0);
+						break;
+					}
+
+					// 現在庫総数
+					result.currentTotalQuantity = minQuantity.intValue();
+
+
+					// 子商品の受注残数を加味して引当可能数を算出する
+					Iterator<Entry<String, BigDecimal>> entryIterator = productQuantityMap
+							.entrySet().iterator();
+					while (entryIterator.hasNext()) {
+						Entry<String, BigDecimal> entry = entryIterator.next();
+						String key = entry.getKey();
+						// 受注残数
+						int rest = this.roSlipService
+								.countRestQuantityByProductCode(key);
+						if (rest != 0) {
+							productQuantityMap.put(key, entry.getValue()
+									.subtract(new BigDecimal(rest)));
+						}
+					}
+
+					// 在庫数量をセット数で割った場合に、最も小さい値となる商品の値を採用
+					minQuantity = null;
+					for (ProductSetJoin productSet : productSetList) {
+						if (productQuantityMap
+								.containsKey(productSet.productCode)) {
+							BigDecimal temp = productQuantityMap.get(
+									productSet.productCode).divide(
+									productSet.quantity, RoundingMode.DOWN);
+							if (minQuantity == null) {
+								minQuantity = temp;
+								continue;
+							}
+
+							if (minQuantity.compareTo(temp) > 0) {
+								minQuantity = temp;
+							}
+							continue;
+						}
+						// 数量が存在しない商品があった時点で終了（セット品としての在庫が不成立）
+						minQuantity = new BigDecimal(0);
+						break;
+					}
+
+					// 引当可能数
+					result.possibleDrawQuantity = minQuantity.intValue();
+					
+					// 受注残数
+					result.rorderRestQuantity = this.roSlipService
+							.countRestQuantityByProductCode(productCode);
+
+					// 保有数
+					result.holdingStockQuantity = result.currentTotalQuantity
+							+ result.entrustStockQuantity + result.porderRestQuantity
+							+ result.entrustRestQuantity - result.rorderRestQuantity;
+					
+					resultList.add(result);
+					
+				}
+
+			}
+			
+			return resultList;
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+	
 }

@@ -12,14 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import jp.co.arkinfosys.dto.DomainDto;
-import jp.co.arkinfosys.dto.UserDto;
-import jp.co.arkinfosys.dto.setting.MineDto;
-import jp.co.arkinfosys.service.TaxRateService;
-
 import org.apache.log4j.Logger;
 import org.apache.struts.action.ActionMessages;
 import org.seasar.framework.beans.util.Beans;
+
+import jp.co.arkinfosys.dto.DomainDto;
+import jp.co.arkinfosys.dto.PbxDto;
+import jp.co.arkinfosys.dto.UserDto;
+import jp.co.arkinfosys.dto.setting.MineDto;
+import jp.co.arkinfosys.service.TaxRateService;
 
 /**
  * アクションクラスの共通基底クラスです.
@@ -48,6 +49,9 @@ public class CommonResources {
 	@Resource
 	public MineDto mineDto;
 
+	@Resource
+	public PbxDto pbxDto;  //AOKI
+
 	/** 税率計算用サービス */
 	@Resource
 	public TaxRateService taxRateService;
@@ -58,6 +62,7 @@ public class CommonResources {
 	protected void clearResources() {
 		Beans.copy(new UserDto(), this.userDto).execute();
 		Beans.copy(new MineDto(), this.mineDto).execute();
+		Beans.copy(new PbxDto(), this.pbxDto).execute();
 	}
 
 	/**

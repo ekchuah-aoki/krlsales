@@ -40,7 +40,17 @@ public class OutputStockListForm {
 	public String RADIO_COND2_VALUE_4 = RadioCond2.VALUE_4;
 	public String RADIO_COND2_VALUE_5 = RadioCond2.VALUE_5;
 	public String RADIO_COND2_VALUE_6 = RadioCond2.VALUE_6;
-
+	
+	//AOKI 出力方法
+	public static class RadioOutType {
+		public static final String VALUE_0 = "0";
+		public static final String VALUE_1 = "1";
+	}
+	public String RADIO_OUTTYPE_VALUE_0 = RadioOutType.VALUE_0;  //商品別
+	public String RADIO_OUTTYPE_VALUE_1 = RadioOutType.VALUE_1;  //棚別
+	
+	
+	
 	/**
 	 * 商品の抽出条件１:ヶ月前～本日　で受注実績のあるもの
 	 */
@@ -94,6 +104,10 @@ public class OutputStockListForm {
 	public List<ProductStockInfoDto> searchResultList;
 
 	/**
+	 * 出力方法
+	 */
+	public String radioOutType;
+	/**
 	 * フォームをクリアします.
 	 */
 	public void reset() {
@@ -105,6 +119,7 @@ public class OutputStockListForm {
 		excludeSalesCancel = true;
 		excludeNotManagementStock = true;
 		excludeMultiRack = true;
+		radioOutType = null;
 	}
 
 	 /**

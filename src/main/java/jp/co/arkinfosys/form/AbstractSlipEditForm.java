@@ -5,18 +5,19 @@ package jp.co.arkinfosys.form;
 
 import java.util.List;
 
+import org.apache.struts.action.ActionMessages;
+
 import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.AbstractLineDto;
 import jp.co.arkinfosys.dto.AbstractSlipDto;
+import jp.co.arkinfosys.dto.PbxDto;
 import jp.co.arkinfosys.dto.UserDto;
 import jp.co.arkinfosys.dto.setting.MineDto;
 import jp.co.arkinfosys.entity.TaxRate;
 import jp.co.arkinfosys.service.TaxRateService;
 import jp.co.arkinfosys.service.exception.ServiceException;
-
-import org.apache.struts.action.ActionMessages;
 
 /**
  * 伝票入力画面の基底アクションフォームクラスです.
@@ -80,6 +81,8 @@ public abstract class AbstractSlipEditForm<LINEDTOCLASS extends AbstractLineDto>
 	/** 自社情報 */
 	public MineDto mineDto;
 
+	/** Pbx情報 */
+	public PbxDto pbxDto;
 	/**
 	 * 伝票が新規作成かどうか判定します.
 	 *

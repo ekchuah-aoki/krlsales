@@ -166,11 +166,25 @@ public class InputStockService extends CommonInputStockService {
 				if (pj != null) {
 					if (CategoryTrns.PRODUCT_STOCK_CTL_YES
 							.equals(pj.stockCtlCategory)) { // 在庫管理区分
+						
+						//AOKI 棚別在庫数にする
+						
+						
+						/*
 						StockInfoDto dto = productStockService
 								.calcStockQuantityByProductCode(eadLineTrnDto.productCode);
+						*/
+						List<StockInfoDto> dtoList = productStockService.calcStockRackQuantityByProductCode(eadLineTrnDto.productCode, true);
+						StockInfoDto dto=null;
+						for(int i=0; i< dtoList.size(); i++ ){
+							dto = dtoList.get(i);
+							if( eadLineTrnDto.rackCode.equals(dto.rackCode)){
+								break;
+							}
+						}
+						
 						eadLineTrnDto.stockCount = Integer
 								.toString(dto.currentTotalQuantity);
-
 						int updQuantity;
 						// 編集時の初期表示時は、変更後在庫数は、現在庫数とする。
 						updQuantity = Integer

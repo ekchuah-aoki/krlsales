@@ -139,6 +139,23 @@ public class CopySlipDialogAction extends AbstractDialogAction {
 	@Resource
 	private InputEntrustStockService inputEntrustStockService;
 
+
+	@Override
+	/**
+	 * 初期表示処理の終了直前に実行されるメソッドです.
+	 *
+	 * @throws Exception
+	 */
+	protected void doAfterIndex() throws Exception {
+		
+		//PBX起動の時、検索条件に顧客コードを設定
+		if(this.pbxDto.pbxMode ){
+			if (this.copySlipDialogForm.menuId.equals("0400")) {
+			}
+		
+		}
+	}
+	
 	/**
 	 * 委託入出庫区分プルダウンの内容を初期化します.
 	 */

@@ -8,11 +8,22 @@ import java.math.MathContext;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.util.LabelValueBean;
+import org.apache.struts.util.TokenProcessor;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.struts.annotation.ActionForm;
+import org.seasar.struts.annotation.Execute;
+import org.seasar.struts.util.ActionMessagesUtil;
+import org.seasar.struts.util.MessageResourcesUtil;
 
 import jp.co.arkinfosys.action.AbstractSlipEditAction;
 import jp.co.arkinfosys.common.Categories;
@@ -20,6 +31,7 @@ import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.ListUtil;
 import jp.co.arkinfosys.common.SlipStatusCategories;
+import jp.co.arkinfosys.common.SlipStatusCategoryTrns;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.AbstractSlipDto;
 import jp.co.arkinfosys.dto.StockInfoDto;
@@ -33,6 +45,7 @@ import jp.co.arkinfosys.entity.RoLineTrn;
 import jp.co.arkinfosys.entity.RoSlipTrn;
 import jp.co.arkinfosys.entity.TaxRate;
 import jp.co.arkinfosys.entity.join.CategoryJoin;
+import jp.co.arkinfosys.entity.join.CustomerJoin;
 import jp.co.arkinfosys.entity.join.DeliveryAndPre;
 import jp.co.arkinfosys.entity.join.ProductJoin;
 import jp.co.arkinfosys.form.AbstractSlipEditForm;
@@ -53,16 +66,6 @@ import jp.co.arkinfosys.service.RoLineService;
 import jp.co.arkinfosys.service.RoSlipService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
-import org.apache.struts.util.TokenProcessor;
-import org.seasar.framework.beans.util.Beans;
-import org.seasar.struts.annotation.ActionForm;
-import org.seasar.struts.annotation.Execute;
-import org.seasar.struts.util.ActionMessagesUtil;
-import org.seasar.struts.util.MessageResourcesUtil;
-
 /**
  * 受注入力画面の表示アクションクラスです.
  *
@@ -81,6 +84,7 @@ public class InputROrderAction extends
 		public static final String EDIT = "/rorder/inputROrder/edit/";
 		public static final String SEARCH = "/rorder/searchROrder";
 		public static final String ONLINE_ORDER = "/rorder/importOnlineOrder";
+		public static final String EDIT_CUSTOMER = "/master/editCustomer";
 	}
 
 
@@ -194,6 +198,63 @@ public class InputROrderAction extends
 	 */
 	public List<LabelValueBean> ctaxRateList;
 
+	
+	/**
+	 * 初期表示処理を行います.<br>
+	 * <p>
+	 * 以下の処理を行います.<br>
+	 * 1. 基底の処理を呼ぶ<br>
+	 * 2. URLパラメータに電話番号が設定されていたら顧客情報を呼び出し<br>
+	 * </p>
+	 * 処理実行後、顧客コードが未登録なら顧客入力画面に進むRIに遷移します.
+	 * @return 画面遷移先のURI文字列
+	 * @throws Exception
+	 */
+	//AOKI
+	@Execute(validator=false)
+	public String index() throws Exception {
+		String url = super.index();
+		String customerTel = this.httpRequest.getParameter("ctel");
+		this.inputROrderForm.loadCustomer = false;
+		
+		if( customerTel == null && !this.pbxDto.pbxMode){
+			return url;
+		}
+		
+		//電話番号はハイフン付きなので消去
+		if(customerTel==null){
+			customerTel = this.pbxDto.customerCode;
+		}else{
+			customerTel = customerTel.replaceAll("-",  "");
+			this.pbxDto.customerCode = customerTel;
+			this.pbxDto.pbxMode = true;
+
+			//最新の受注番号を取得
+			CustomerJoin customerJoin = this.customerService.findById(customerTel);
+			
+			//顧客が未登録なら、顧客登録に進む
+			if( customerJoin == null){
+				return Mapping.EDIT_CUSTOMER;
+			}
+			this.pbxDto.customerName = customerJoin.customerName;
+		}
+		
+		
+		this.inputROrderForm.customerCode=customerTel;
+
+		String lastSlioId = this.roSlipService.getLastRoSlipId(customerTel);
+		
+		if( StringUtil.isEmpty(lastSlioId) ){
+			this.inputROrderForm.loadCustomer = true;
+		}else{
+			this.inputROrderForm.roSlipId = lastSlioId;
+			this.inputROrderForm.loadLastSlip = true;
+			this.load();
+		}
+		
+		return url;
+	}
+	
 	/**
 	 * オンライン受注データの表示を行います.
 	 * <p>
@@ -1010,6 +1071,12 @@ public class InputROrderAction extends
 
 		// リストを初期化
 		ROrderSlipDto dto = (ROrderSlipDto) inputROrderForm.copyToDto();
+		
+		//PBX起動時で読み込んだ受注データは新規扱いなので、ステータスも変更する
+		if(this.pbxDto.pbxMode && this.inputROrderForm.loadLastSlip){
+			dto.status = Constants.STATUS_RORDER_SLIP.RECEIVED;
+		}
+		
 		initForms(dto);
 
 		// 各行に引当可能数を設定
@@ -1017,8 +1084,28 @@ public class InputROrderAction extends
 			if (!StringUtil.hasLength(lineDto.productCode)) {
 				continue;
 			}
-			StockInfoDto stockInfo = productStockService
-					.calcStockQuantityByProductCode(lineDto.productCode);
+			
+			//AOKI PBX起動で表示時のロードの場合は、新規状態にする
+			if(this.pbxDto.pbxMode && this.inputROrderForm.loadLastSlip){
+				lineDto.roLineId = "";
+				lineDto.roSlipId = "";
+				lineDto.status = SlipStatusCategoryTrns.RO_LINE_NEW;
+				lineDto.restQuantity = lineDto.quantity;			// 未納数
+				lineDto.restQuantityDB = lineDto.quantity;		// 未納数(hidden)
+			}
+			
+			//AOKI 棚別引当数に変更
+			//StockInfoDto stockInfo = productStockService
+			//		.calcStockQuantityByProductCode(lineDto.productCode);
+			List<StockInfoDto> stokInfoList = productStockService.calcStockRackQuantityByProductCode(lineDto.productCode,false);	
+			StockInfoDto stockInfo = null;
+			for( StockInfoDto s : stokInfoList){
+				if( s.rackCode.equals(lineDto.rackCodeSrc)){
+					stockInfo = s;
+					break;
+				}
+			}
+
 			lineDto.possibleDrawQuantity = String
 					.valueOf(stockInfo.possibleDrawQuantity);
 			// 完納状態を設定
@@ -1061,6 +1148,24 @@ public class InputROrderAction extends
 							categoryName, strActionLabel));
 		}
 
+		//AOKI PBX起動の時は、新規モードにする
+		if(this.pbxDto.pbxMode &&  this.inputROrderForm.loadLastSlip){
+			inputROrderForm.roSlipId = "";
+			inputROrderForm.newData = true;
+			inputROrderForm.setKeyValue("");
+
+			// 担当者
+			inputROrderForm.userId = inputROrderForm.userDto.userId;		// 担当者コード
+			inputROrderForm.userName = inputROrderForm.userDto.nameKnj;		// 担当者名
+			
+			// 受注日・納品日
+			SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT.DATE);
+			inputROrderForm.roDate = sdf.format(new Date());
+			inputROrderForm.shipDate = sdf.format(new Date());
+			
+			
+		}
+		
 		ActionMessagesUtil.addMessages(super.httpRequest, super.messages);
 	}
 

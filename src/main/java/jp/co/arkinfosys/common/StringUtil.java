@@ -324,5 +324,18 @@ public final class StringUtil {
 
      }
 
+	  /**
+	   * 空かチェック。
+	   * AOKI
+	   * @return trur:空
+	   */
+  public static boolean isEmpty(String val){
+	  if( val == null || val.equals("")){
+		  return true;
+	  }
+	  
+	  return false;
+
+   }
 
 }

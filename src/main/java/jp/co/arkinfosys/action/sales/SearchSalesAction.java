@@ -66,6 +66,16 @@ public class SearchSalesAction extends AbstractSearchAction<List<Object>> {
 		// 受注入力画面の権限フラグを設定
 		this.searchSalesForm.isInputROrderValid = userDto
 				.isMenuValid(Constants.MENU_ID.INPUT_RORDER);
+		
+		
+		//PBX起動モードなら、顧客コードを設定し、検査を実行させる
+		if(this.pbxDto.pbxMode ){
+			this.searchSalesForm.searchTarget = Constants.SEARCH_TARGET.VALUE_SLIP;
+			this.searchSalesForm.customerCode = this.pbxDto.customerCode;
+			//this.searchROrderForm.customerName = this.pbxDto.customerName;
+			this.searchSalesForm.initSearch = true;
+		}
+		
 	}
 
 	/**

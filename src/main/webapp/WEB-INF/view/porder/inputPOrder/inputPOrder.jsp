@@ -586,9 +586,11 @@ function ProductCodeChange(id){
 					InitProductInfos(id);
 				}else{
 					var value = eval("(" + data + ")");
+					
 					SetProductInfosToFroms(id,value);
 					//レートによる単価の再計算は商品情報読込み時は行わない仕様とする。（09/12/28確認）
 					//明示的に外貨単価が変更された場合は再計算される。
+					
 				}
 				//しかし、単価->金額の計算は行う
 				//指定行全計算(レート換算なし)
@@ -606,11 +608,15 @@ function searchProductCode(event){
 }
 
 function ProductCodeSearch(id){
-	openSearchProductDialog( 'product'+id ,
+	openSearchProductStokDialog( 'product'+id , "1", 
 		function(openID,data){
 			$("#productCode_" + id).attr("value",data.productCode);
 			var param = new Object();
 			param["tempProductCode"] = data.productCode;
+			
+			//AOKI 検索画面のrackcode保存
+			var rackCode =  data.rackCode;
+			
 			asyncRequest(
 					contextRoot + "/ajax/commonPOrder/getProductInfosByPost/",
 					param,
@@ -621,6 +627,10 @@ function ProductCodeSearch(id){
 							InitProductInfos(id);
 						}else{
 							var value = eval("(" + data + ")");
+							
+							//AOKI 棚番は、検索画面の値を使用する
+							value.rackCode = rackCode;
+							
 							SetProductInfosToFroms(id,value);
 							//レートによる単価の再計算は商品情報読込み時は行わない仕様とする。（09/12/28確認）
 							//明示的に外貨単価が変更された場合は再計算される。

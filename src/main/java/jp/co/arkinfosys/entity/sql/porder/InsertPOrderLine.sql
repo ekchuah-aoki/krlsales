@@ -6,6 +6,7 @@ PO_LINE_ID
 ,PO_SLIP_ID
 ,LINE_NO
 ,PRODUCT_CODE
+,RACK_CODE
 ,SUPPLIER_PCODE
 ,PRODUCT_ABSTRACT
 ,QUANTITY
@@ -36,6 +37,7 @@ SELECT
 ,/*poSlipId*/
 ,/*lineNo*/
 ,/*productCode*/
+,/*rackCode*/
 ,/*supplierPcode*/
 ,/*productAbstract*/
 ,/*quantity*/

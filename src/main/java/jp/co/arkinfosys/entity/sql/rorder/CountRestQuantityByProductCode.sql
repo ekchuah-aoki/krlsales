@@ -24,6 +24,9 @@ FROM
 			) SX ON RL.PRODUCT_CODE = SX.PRODUCT_CODE AND RL.RO_LINE_ID = SX.RO_LINE_ID
 	    WHERE
 	    	RL.PRODUCT_CODE = /*productCode*/'AAA'
+			/*IF rackCode != null*/
+	    	AND RL.RACK_CODE_SRC = /*rackCode*/
+	    	/*END*/
     	/*IF setProductCode != null*/
 		UNION ALL
 		SELECT
@@ -48,6 +51,10 @@ FROM
 			) SX ON RL.PRODUCT_CODE = SX.PRODUCT_CODE AND RL.RO_LINE_ID = SX.RO_LINE_ID
 		WHERE
 			RL.PRODUCT_CODE IN /*setProductCode*/('BBB','CCC')
+			/*IF rackCode != null*/
+	    	AND RL.RACK_CODE_SRC = /*rackCode*/
+	    	/*END*/
+			
 		/*END*/
 	) A
 GROUP BY

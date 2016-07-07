@@ -30,8 +30,8 @@ public class PurchaseLineDto extends AbstractLineDto {
     public String price;
     public String ctaxRate;
     public String ctaxPrice;
-    public String dolUnitPrice;
-    public String dolPrice;
+    public String dolUnitPrice="";
+    public String dolPrice="";
     public String rate;
     public String remarks;
 	public String productRemarks;
@@ -51,6 +51,8 @@ public class PurchaseLineDto extends AbstractLineDto {
     public String oldQuantity;
     public String restQuantity;
     public String totalQuantity;
+    
+    public String madeDate;
 
     @Override
     public String toString() {

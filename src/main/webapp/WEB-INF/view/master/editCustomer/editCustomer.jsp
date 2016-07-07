@@ -986,12 +986,12 @@
 							onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); convertPaymentName(this.value); }"/></td>
 				</tr>
 				<tr>
-					<th><div class="col_title_right_req">事業所名<bean:message key='labels.must'/></div></th>
+					<th><div class="col_title_right">事業所名</div></th>
 					<td><html:text maxlength="60" styleId="customerOfficeName" property="customerOfficeName" style="width:250px" tabindex="104"/></td>
-					<th><div class="col_title_right_req">事業所名カナ<bean:message key='labels.must'/></div></th>
+					<th><div class="col_title_right">事業所名カナ</div></th>
 					<td><html:text maxlength="60" styleId="customerOfficeKana" property="customerOfficeKana" style="width:250px" tabindex="105"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/></td>
-					<th><div class="col_title_right_req">顧客略称<bean:message key='labels.must'/></div></th>
+					<th><div class="col_title_right">顧客略称</div></th>
 					<td><html:text maxlength="14" styleId="customerAbbr" property="customerAbbr" style="width:250px" tabindex="106"/></td>
 				</tr>
 			</table>

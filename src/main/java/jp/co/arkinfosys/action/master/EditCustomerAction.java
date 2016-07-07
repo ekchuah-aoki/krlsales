@@ -107,6 +107,14 @@ public class EditCustomerAction extends AbstractEditAction<CustomerDto, Customer
 	@Execute(validator = false)
 	public String index() throws Exception {
 		this.init(null);
+		
+		//AOKI PBX起動時は顧客コード、電話番号を設定
+		if(this.pbxDto.pbxMode){
+			this.editCustomerForm.customerCode = this.pbxDto.customerCode;
+			this.editCustomerForm.customerTel = this.pbxDto.customerCode;
+		}
+		
+		
 		return this.getInputURL();
 	}
 
@@ -209,6 +217,11 @@ public class EditCustomerAction extends AbstractEditAction<CustomerDto, Customer
 							MessageResourcesUtil.getMessage("labels.bill")));
 		}
 
+		//AOKI 顧客名称を設定
+		if( this.pbxDto.pbxMode){
+			this.pbxDto.customerName = editCustomerForm.customerName;
+		}
+		
 		ActionMessagesUtil.addMessages(super.httpRequest, messages);
 	}
 
@@ -379,6 +392,12 @@ public class EditCustomerAction extends AbstractEditAction<CustomerDto, Customer
 			messages.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
 					"infos.noupdate"));
 		}
+		
+		//AOKI 顧客名称を設定
+		if( this.pbxDto.pbxMode){
+			this.pbxDto.customerName = editCustomerForm.customerName;
+		}
+		
 		ActionMessagesUtil.addMessages(super.httpRequest, messages);
 	}
 

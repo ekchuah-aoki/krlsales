@@ -71,6 +71,14 @@ public class OutputStockListService extends AbstractService<EadSlipTrn> {
 				conditions.put(ProductService.Param.RACK_MULTI_FLAG, Constants.FLAG.OFF);
 			}
 			conditions.put(ProductService.Param.SET_TYPE_CATEGORY, CategoryTrns.PRODUCT_SET_TYPE_SINGLE);
+
+			//AOKI 出力方法（商品別、棚別）
+			if(OutputStockListForm.RadioOutType.VALUE_1.equals(outputStockListFormDto.radioOutType)) {
+				conditions.put(ProductService.Param.OUTTYPE_RACK, Constants.FLAG.ON);
+			}else{
+				conditions.put(ProductService.Param.OUTTYPE_RACK, Constants.FLAG.OFF);
+			}
+			
 			List<ProductStockInfoDto> dtoList = productService.aggregateProductStockInfoByCondition(conditions);
 
 			if(!OutputStockListForm.RadioCond2.VALUE_0.equals(outputStockListFormDto.radioCond2)) {

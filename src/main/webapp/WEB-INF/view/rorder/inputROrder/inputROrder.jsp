@@ -1,6 +1,7 @@
 <%@page import="jp.co.arkinfosys.common.Constants"%>
 <%@page import="jp.co.arkinfosys.common.CategoryTrns"%>
 <%@page import="jp.co.arkinfosys.common.SlipStatusCategoryTrns"%>
+<%@page import="jp.co.arkinfosys.common.CategoryTrns"%>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html lang="ja">
@@ -115,7 +116,14 @@
 		}
 
 		$("#customerCode").attr("maxlength", <%=Constants.CODE_SIZE.CUSTOMER%>);	//顧客コードの文字数制限10桁
-
+	
+		//顧客情報呼び出しが必要な場合、呼び出す
+		//Pbx起動で受注履歴がない場合
+		if(${loadCustomer}){
+			GetCustomerInfos();
+		}
+		
+		
 	}
 
 	function findSlip(){
@@ -562,7 +570,7 @@
             return;
         }
 
-        openSearchProductDialog('product', callbackOpenSearchProductDialog);
+        openSearchProductStokDialog('product', "0", callbackOpenSearchProductDialog);
         setInit("product", "productRow_" + lineNo + "_code");
 
     }
@@ -579,6 +587,7 @@
 	function searchProductStock(id,map, lineNo){
         var data = new Object();
 		data["productCode"] = map["productCode"];
+		data["rackCode"] = map["rackCode"];
 
 		asyncRequest(
 			contextRoot + "/ajax/dialog/showStockInfoDialog/calcStock",
@@ -625,6 +634,39 @@
         			}else{
         				var value = eval("(" + data + ")");
         				SetProductInfosToFroms(lineNo,value, lineNo);
+        			}
+        		}
+        	);
+    	}
+    	return false;
+    }
+    
+    //AOKI 入力した商品が「在庫管理する」商品であれな、商品選択画面を表示する
+    function searchProduct2(event) {
+        var lineNo = event.data.lineNo;
+        var productCode = $("#productRow_" + lineNo + "_code").val();
+    	var label = '<bean:message key="labels.productCode" />';
+        if (productCode == "") {
+			SetProductInfosToFroms(lineNo, null, lineNo);
+            return;
+    	}else{
+
+    		var data = new Object();
+    		data["productCode"] = productCode;
+        	asyncRequest(
+        		contextRoot + "/ajax/commonProduct/getProductInfos",
+        		data,
+        		function(data) {
+        			if(data==""){
+        				alert('<bean:message key="errors.notExist" arg0="'+label+'" />');
+        				SetProductInfosToFroms(lineNo, null, lineNo);
+        			}else{
+        				var value = eval("(" + data + ")");
+        				SetProductInfosToFroms(lineNo,value, lineNo);
+        				
+        				if( value.stockCtlCategory == "<%=CategoryTrns.PRODUCT_STOCK_CTL_YES%>" ){
+        					openSearchProduct(event);
+        				}
         			}
         		}
         	);
@@ -683,7 +725,7 @@
         	$("#" + localId + "_roMaxNum").val("");
         	// 在庫情報
         	// 引当可能数
-        	$("#" + localId + "_possibleDrawQuantity").val("");
+        	$("#" + localId + "_possibleDrawQuantity").text("");
 
             // 備考
             $("#" + localId + "_remarks").val("");
@@ -758,7 +800,7 @@
         	$("#" + localId + "_roMaxNum").val(map["roMaxNum"]);
         	// 在庫情報
         	// 引当可能数
-        	$("#" + localId + "_possibleDrawQuantity").val(map["possibleDrawQuantity"]);
+        	$("#" + localId + "_possibleDrawQuantity").text(map["possibleDrawQuantity"]);
 
             // 備考
             $("#" + localId + "_productRemarks").val(map["remarks"]);
@@ -949,7 +991,7 @@
 
             if(IsCheckpossibleDrawQuantity(id)){
 		        // 引当可能数
-		        var possibleDrawQuantity = Number(oBDCS($("#" + id + "_possibleDrawQuantity").val()).setSettingsFromObj($("#" + id + "_possibleDrawQuantity")).value());
+		        var possibleDrawQuantity = Number(oBDCS($("#" + id + "_possibleDrawQuantity").text()).setSettingsFromObj($("#" + id + "_possibleDrawQuantity")).value());
 		        // チェック２
 		        if (lquantity > 0 && lquantity > possibleDrawQuantity && !bExceptianal ) {
 		    		alert('<bean:message key="warns.quantity.over.possibleDrawQuantity" />');
@@ -1020,7 +1062,7 @@
 			        // 引当可能数のチェックをするか？
 			        if(IsCheckpossibleDrawQuantity(id)){
 				        // 引当可能数
-				        var possibleDrawQuantity = Number(oBDCS($("#productRow_" + i + "_possibleDrawQuantity").val()).setSettingsFromObj($("#productRow_" + i + "_possibleDrawQuantity")).value());
+				        var possibleDrawQuantity = Number(oBDCS($("#productRow_" + i + "_possibleDrawQuantity").text()).setSettingsFromObj($("#productRow_" + i + "_possibleDrawQuantity")).value());
 				        // チェック２
 //				        if (quantity > 0 && quantity > possibleDrawQuantity && !bExceptianal) {
 						if (quantity > possibleDrawQuantity) {
@@ -1245,7 +1287,7 @@
             $("#productRow_" + i + "_code").unbind("focus");
             $("#productRow_" + i + "_code").bind("focus", {lineNo: i-1}, function(e){ this.curVal=this.value; });
             $("#productRow_" + i + "_code").unbind("blur");
-            $("#productRow_" + i + "_code").bind("blur", {lineNo: i-1}, function(e){ if(this.curVal!=this.value){ this.value=this.value.toUpperCase(); searchProduct(e); } });
+            $("#productRow_" + i + "_code").bind("blur", {lineNo: i-1}, function(e){ if(this.curVal!=this.value){ this.value=this.value.toUpperCase(); searchProduct2(e); } });
             $("#productRow_" + i + "_code").attr("id", "productRow_" + (i-1) + "_code");
 			$("#productRow_" + i + "_code").attr("tabindex", (++tabIdx));
 
@@ -1567,7 +1609,7 @@
     	elemWork.unbind("focus");
     	elemWork.bind("focus", {"lineNo": lineNo}, function(e){ this.curVal=this.value; });
     	elemWork.unbind("blur");
-    	elemWork.bind("blur", {"lineNo": lineNo}, function(e){ if(this.curVal!=this.value){ this.value=this.value.toUpperCase(); searchProduct(e); } });
+    	elemWork.bind("blur", {"lineNo": lineNo}, function(e){ if(this.curVal!=this.value){ this.value=this.value.toUpperCase(); searchProduct2(e); } });
         elemWork.val("");
 
     	elemWork = elemTd.children().children("#productRow_1_icon");
@@ -1868,7 +1910,7 @@
     	}
 
         $("#productRow_" + lineNo + "_status").val(${defaultStatusCode});
-    	$("#productRow_" + lineNo + "_possibleDrawQuantity").val($("#productRow_" + source + "_possibleDrawQuantity").val());
+    	$("#productRow_" + lineNo + "_possibleDrawQuantity").text($("#productRow_" + source + "_possibleDrawQuantity").text());
 
     	$("#productRow_" + lineNo + "_restQuantity_hidden").val($("#productRow_" + source + "_quantity").val());
     	$("#productRow_" + lineNo + "_taxCategory_hidden").val($("#productRow_" + source + "_taxCategory_hidden").val());
@@ -2607,7 +2649,7 @@
 				<script type="text/javascript">
 	                // イベントの貼り付け
 	                $("#productRow_${s.index+1}_code").bind("focus", {lineNo: ${s.index+1}}, function(e){ this.curVal=this.value; });
-	                $("#productRow_${s.index+1}_code").bind("blur", {lineNo: ${s.index+1}}, function(e){ if(this.curVal!=this.value){ searchProduct(e); } });
+	                $("#productRow_${s.index+1}_code").bind("blur", {lineNo: ${s.index+1}}, function(e){ if(this.curVal!=this.value){ searchProduct2(e); } });
 	                $("#productRow_${s.index+1}_icon").bind("click", {lineNo: ${s.index+1}}, openSearchProduct);
 	                $("#productRow_${s.index+1}_stockBtn").bind("click", {lineNo: 'productRow_${s.index+1}'}, onStockButton);
 	                if ($("#productRow_${s.index+1}_deletable").val() == "false") {
@@ -2718,3 +2760,4 @@
 </div>
 </body>
 </html>
+

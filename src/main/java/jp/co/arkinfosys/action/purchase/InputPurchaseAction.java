@@ -9,6 +9,16 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.apache.struts.action.ActionMessage;
+import org.apache.struts.action.ActionMessages;
+import org.apache.struts.util.LabelValueBean;
+import org.seasar.framework.beans.Converter;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.struts.annotation.ActionForm;
+import org.seasar.struts.annotation.Execute;
+import org.seasar.struts.util.ActionMessagesUtil;
+import org.seasar.struts.util.MessageResourcesUtil;
+
 import jp.co.arkinfosys.action.AbstractSlipEditAction;
 import jp.co.arkinfosys.common.Categories;
 import jp.co.arkinfosys.common.CategoryTrns;
@@ -28,6 +38,7 @@ import jp.co.arkinfosys.entity.SupplierLineTrn;
 import jp.co.arkinfosys.entity.SupplierSlipTrn;
 import jp.co.arkinfosys.entity.join.PoLineTrnJoin;
 import jp.co.arkinfosys.entity.join.ProductJoin;
+import jp.co.arkinfosys.entity.join.RackJoin;
 import jp.co.arkinfosys.entity.join.SupplierJoin;
 import jp.co.arkinfosys.form.AbstractSlipEditForm;
 import jp.co.arkinfosys.form.purchase.InputPurchaseForm;
@@ -44,16 +55,6 @@ import jp.co.arkinfosys.service.SupplierService;
 import jp.co.arkinfosys.service.SupplierSlipService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 import jp.co.arkinfosys.service.stock.InputStockPurchaseService;
-
-import org.apache.struts.action.ActionMessage;
-import org.apache.struts.action.ActionMessages;
-import org.apache.struts.util.LabelValueBean;
-import org.seasar.framework.beans.Converter;
-import org.seasar.framework.beans.util.Beans;
-import org.seasar.struts.annotation.ActionForm;
-import org.seasar.struts.annotation.Execute;
-import org.seasar.struts.util.ActionMessagesUtil;
-import org.seasar.struts.util.MessageResourcesUtil;
 
 /**
  * 仕入入力画面のアクションクラスです.
@@ -580,12 +581,24 @@ public class InputPurchaseAction extends AbstractSlipEditAction<PurchaseSlipDto,
 				}
 				// 標準棚番、倉庫名を設定
 				if( StringUtil.hasLength(poLineTrn.productCode)){
-					ProductJoin pj = productService.findById(poLineTrn.productCode);
-					if( pj != null ){
-						dto.rackCode = pj.rackCode;
-						dto.rackName = pj.rackName;
-						dto.warehouseName = pj.warehouseName;
+					if( poLineTrn.rackCode != null){
+						RackJoin rj = rackService.findById(poLineTrn.rackCode);
+						if( rj != null ){
+							dto.rackCode = rj.rackCode;
+							dto.rackName = rj.rackName;
+							dto.warehouseName = rj.warehouseName;
+						}
+						
+					}else{
+						ProductJoin pj = productService.findById(poLineTrn.productCode);
+						if( pj != null ){
+							dto.rackCode = pj.rackCode;
+							dto.rackName = pj.rackName;
+							dto.warehouseName = pj.warehouseName;
+						}
+						
 					}
+					
 				}
 				inputPurchaseForm.lineDtoList.add(dto);
 			}

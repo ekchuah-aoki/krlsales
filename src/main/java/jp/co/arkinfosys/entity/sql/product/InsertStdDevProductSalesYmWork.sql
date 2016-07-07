@@ -2,6 +2,9 @@ INSERT INTO STDDEV_PRODUCT_SALES_YM_WORK_/*$domainId*/ (
 	SESSION_ID,
 	YM,
 	PRODUCT_CODE,
+	/*IF outtypeRack != null*/
+	RACK_CODE,
+	/*END*/
 	QUANTITY
 )
 (
@@ -9,6 +12,10 @@ INSERT INTO STDDEV_PRODUCT_SALES_YM_WORK_/*$domainId*/ (
 			/*sessionId*/ AS SESSION_ID,
 			SS.SALES_YM,
 			SL.PRODUCT_CODE,
+			/*IF outtypeRack != null*/
+			SL.RACK_CODE_SRC AS RACK_CODE,
+			/*END*/
+			
 			SUM(SL.QUANTITY)
 		FROM
 			SALES_SLIP_TRN_/*$domainId*/ SS INNER JOIN SALES_LINE_TRN_/*$domainId*/ SL ON SS.SALES_SLIP_ID = SL.SALES_SLIP_ID
@@ -18,4 +25,7 @@ INSERT INTO STDDEV_PRODUCT_SALES_YM_WORK_/*$domainId*/ (
 			SESSION_ID,
 			SS.SALES_YM,
 			SL.PRODUCT_CODE
+			/*IF outtypeRack != null*/
+			,SL.RACK_CODE_SRC
+			/*END*/
 )

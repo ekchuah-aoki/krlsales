@@ -874,8 +874,11 @@
 						</tr>
 						<tr>
 							<th style="height:20px;">納期</th>
+							<th colspan="2" style="height:20px;">製造年月日<span class="yenMust"><bean:message key='labels.must'/></span></th>
+							<!-- 
 							<th style="height:20px;">外貨単価<span class="dolMust"><bean:message key='labels.must'/></span></th>
 							<th style="height:20px;">外貨金額<span class="dolMust"><bean:message key='labels.must'/></span></th>
+							 -->
 							<th style="height:20px;">棚番※</th>
 						</tr>
 					</thead>
@@ -975,8 +978,13 @@
 										<html:text name="lineDtoList" property="price" indexed="true" styleId="lineDtoList[${status.index}].price" styleClass="AutoCalcPrice numeral_commas yen_value" style="width:43%; height: 30px; margin:10px 10px 0;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
 									</div>
 									<div class="box_3of3" style="height: 50px;">
+										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10" />
+										<html:hidden name="lineDtoList" property="dolUnitPrice" styleId="lineDtoList[${status.index}].dolUnitPrice" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" />
+										<html:hidden name="lineDtoList" property="dolPrice"  styleId="lineDtoList[${status.index}].dolPrice" styleClass="AutoCalcDolPrice numeral_commas dollar_value" style="width:43%; margin:10px 10px 0; height:30px;"  />
+									<!-- 
 										<html:text name="lineDtoList" property="dolUnitPrice" indexed="true" styleId="lineDtoList[${status.index}].dolUnitPrice" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
 										<html:text name="lineDtoList" property="dolPrice" indexed="true" styleId="lineDtoList[${status.index}].dolPrice" styleClass="AutoCalcDolPrice numeral_commas dollar_value" style="width:43%; margin:10px 10px 0; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
+									 -->
 									</div>
 								</td>
 

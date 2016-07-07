@@ -364,7 +364,7 @@
 
 						<table id="search_info2" class="forms" summary="search_info4">
 							<tr>
-								<th><div class="col_title_right"><bean:message key='labels.reason'/></div></th><%// 理由 %>
+								<th><div class="col_title_right"><bean:message key='labels.containerNo'/></div></th><%// コンテナNo%>
 								<td colspan="7">
 									<html:text property="remarks" styleId="remarks" style="width: 500px" tabindex="206" />
 								</td>

@@ -216,7 +216,12 @@ public class InputROrderForm extends AbstractSlipEditForm<ROrderLineDto> {
 
 	public CategoryService categoryService;
 
+	//AOKI
+	public boolean loadCustomer = false;
 
+	//AOKI PBXの時、最新の受注データを読み込み
+	public boolean loadLastSlip = false;
+	
 	// 区分トランザクションデータ
 	// 課税
 	public String TAX_CATEGORY_IMPOSITION = CategoryTrns.TAX_CATEGORY_IMPOSITION;
@@ -226,7 +231,6 @@ public class InputROrderForm extends AbstractSlipEditForm<ROrderLineDto> {
 	public String TAX_CATEGORY_INCLUDED = CategoryTrns.TAX_CATEGORY_INCLUDED;
 	// 税転嫁　内税
 	public String TAX_SHIFT_CATEGORY_INCLUDE_CTAX = CategoryTrns.TAX_SHIFT_CATEGORY_INCLUDE_CTAX;
-
 
 	/**
 	 * 初期値を設定します.
@@ -412,6 +416,9 @@ public class InputROrderForm extends AbstractSlipEditForm<ROrderLineDto> {
 		dcTimezone = ""; // 配送時間帯文字列
 
 		copySlipId = ""; // 複写対象伝票番号
+		
+		loadCustomer=false;
+		
 	}
 
 	/**

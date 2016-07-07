@@ -17,6 +17,7 @@ import jp.co.arkinfosys.form.rorder.SearchROrderForm;
 import jp.co.arkinfosys.service.CategoryService;
 import jp.co.arkinfosys.service.DetailDispItemService;
 import jp.co.arkinfosys.service.ProductClassService;
+import jp.co.arkinfosys.service.ROrderService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 
 import org.seasar.struts.annotation.ActionForm;
@@ -55,10 +56,22 @@ public class SearchROrderAction extends AbstractSearchAction<List<Object>> {
 	@Override
 	protected void doAfterIndex() throws Exception {
 		this.searchROrderForm.searchTarget = Constants.SEARCH_TARGET.VALUE_LINE;
+		
+		//AOKI デフォルトソート項目
+		this.searchROrderForm.sortColumn = ROrderService.Param.RO_DATE;
+		this.searchROrderForm.sortOrderAsc = false;
 
 		// 検索結果表示項目の取得
 		this.columnInfoList = detailDispItemService.createResult(null, null,
 				this.getSearchMenuID(), Constants.SEARCH_TARGET.VALUE_LINE);
+		
+		//PBX起動モードなら、顧客コードを設定し、検査を実行させる
+		if(this.pbxDto.pbxMode ){
+			this.searchROrderForm.searchTarget = Constants.SEARCH_TARGET.VALUE_SLIP;
+			this.searchROrderForm.customerCode = this.pbxDto.customerCode;
+			//this.searchROrderForm.customerName = this.pbxDto.customerName;
+			this.searchROrderForm.initSearch = true;
+		}
 	}
 
 	/**
@@ -69,6 +82,8 @@ public class SearchROrderAction extends AbstractSearchAction<List<Object>> {
 	protected AbstractSearchForm<List<Object>> getActionForm() {
 		return this.searchROrderForm;
 	}
+	
+	
 
 	/**
 	 * 入力画面のメニューIDを返します.

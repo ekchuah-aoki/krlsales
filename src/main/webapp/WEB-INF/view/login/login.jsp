@@ -33,7 +33,7 @@
 	--%>
 	<%-- ログインイメージの表示 --%>
 	<div style="text-align: center; width: 500px;margin-left : auto ; margin-right : auto ; margin-top: 200px;">
-		<img src="${f:url('/images/login_logo.jpg')}">
+		<img src="${f:url('/images/login_logo.png')}">
 	</div>
 
 	<%-- メニュー領域 --%>

@@ -22,6 +22,7 @@ import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.ExistsCheckStateDto;
+import jp.co.arkinfosys.dto.StockInfoDto;
 import jp.co.arkinfosys.dto.master.ProductDto;
 import jp.co.arkinfosys.dto.master.ProductExcelRowDto;
 import jp.co.arkinfosys.dto.stock.ProductStockInfoDto;
@@ -49,6 +50,7 @@ import org.seasar.struts.util.MessageResourcesUtil;
 public class ProductService extends
 		AbstractMasterEditService<ProductDto, ProductJoin> implements
 		MasterSearch<ProductJoin> {
+
 
 	@Resource
 	private DiscountRelService discountRelService;
@@ -216,6 +218,8 @@ public class ProductService extends
 
 		public static final String AGGREGATE_MONTHS_RANGE = "aggregateMonthsRange";
 
+		public static final String OUTTYPE_RACK = "outtypeRack";
+
 		public static final String RACK_MULTI_FLAG = "rackMultiFlag";
 
 		public static final String RO_EXISTS = "roExists";
@@ -367,9 +371,13 @@ public class ProductService extends
 
 			this.setCondition(conditions, sortColumn, sortOrderAsc, param);
 
-			return this.selectBySqlFile(ProductJoin.class,
+			// AOKI 商品検索をする
+			List<ProductJoin> productList = this.selectBySqlFile(ProductJoin.class,
 					"product/FindProductByCondition.sql", param)
 					.getResultList();
+			
+			return productList;
+			
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}
@@ -1482,6 +1490,13 @@ public class ProductService extends
 				param.put(Param.RO_EXISTS, conditions.get(Param.RO_EXISTS));
 			} else {
 				param.put(Param.RO_EXISTS, null);
+			}
+			
+			//AOKI出力方法(商品別、棚別）
+			if (conditions.containsKey(Param.OUTTYPE_RACK)) {
+				param.put(Param.OUTTYPE_RACK, conditions.get(Param.OUTTYPE_RACK));
+			}else{
+				param.put(Param.OUTTYPE_RACK, null);
 			}
 
 			this.setConditionAggregate(conditions, sortColumn, sortOrderAsc,

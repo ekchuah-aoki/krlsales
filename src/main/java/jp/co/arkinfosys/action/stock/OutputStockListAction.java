@@ -53,6 +53,7 @@ public class OutputStockListAction extends CommonResources {
 		outputStockListForm.radioCond2 = "0";
 		rackCategoryList = outputStockListService.getRackCategoryList();
 		rackCategoryList = ListUtil.addEmptyLabelValue(rackCategoryList);
+		outputStockListForm.radioOutType = "1";
 
 		return Mapping.INPUT;
 	}

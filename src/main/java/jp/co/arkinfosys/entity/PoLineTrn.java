@@ -39,6 +39,8 @@ public class PoLineTrn implements Serializable {
 	public Short lineNo;
 	@Column(name = "PRODUCT_CODE")
 	public String productCode;
+	@Column(name = "RACK_CODE")
+	public String rackCode;
 	@Column(name = "SUPPLIER_PCODE")
 	public String supplierPcode;
 	@Column(name = "PRODUCT_ABSTRACT")

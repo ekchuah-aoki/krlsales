@@ -102,14 +102,34 @@ public class CommonProductAction extends CommonAjaxResources {
 
 			product = productService
 					.findById(commonProductForm.productCode);
-			this.stockInfoDto = this.productStockService
-					.calcStockQuantityByProductCode(commonProductForm.productCode);
 
+			this.stockInfoDto = null;
+			
 			// 棚番コードの指定がない時は標準棚を設定
 			if (product != null
 					&& !StringUtil.hasLength(commonProductForm.rackCode)) {
 				commonProductForm.rackCode = product.rackCode;
+				this.stockInfoDto = this.productStockService
+						.calcStockQuantityByProductCode(commonProductForm.productCode);
+				
+			}else{
+				List<StockInfoDto> stokList = this.productStockService
+						.calcStockRackQuantityByProductCode(commonProductForm.productCode,true);
+				//該当する棚番号の在庫情報を返す
+				//倉庫別在庫がない場合は、今まで通り
+				for(StockInfoDto stok : stokList){
+					if( stok.rackCode.equals(commonProductForm.rackCode)){
+						this.stockInfoDto = stok;
+						break;
+					}
+				}
+
+				if( this.stockInfoDto == null ){
+					this.stockInfoDto = this.productStockService
+							.calcStockQuantityByProductCode(commonProductForm.productCode);
+				}
 			}
+			
 			// 移動可能数(棚在庫数)を計算
 			int unclosedQuantity = eadService
 					.countUnclosedQuantityByProductCode(
