@@ -86,31 +86,33 @@ public class SearchOutputSalesReportAjaxAction extends
 		List<OutputSalesSearchResultDto> allSearchResultList = this.outputSalesReportForm.searchResultList;
 		
 		//納品書出力不要なのに、納品書出力回数が０で、対象になっているのを消去する
-		List<OutputSalesSearchResultDto> newList = new ArrayList<OutputSalesSearchResultDto>();
-		for( OutputSalesSearchResultDto dto : allSearchResultList){
+		if(this.outputSalesReportForm.excludingOutputAll){
+			List<OutputSalesSearchResultDto> newList = new ArrayList<OutputSalesSearchResultDto>();
+			for( OutputSalesSearchResultDto dto : allSearchResultList){
+				
+				boolean target = false;
+				//納品書
+				if( dto.isDeliveryCheckDisp && dto.deliveryPrintCount.equals("0")){
+					target = true;
+				}
+				//仮納品書発行
+				if( dto.isTempDeliveryCheckDisp && dto.tempDeliverySlipFlag.equals("0")){
+					target = true;
+				}
+				//納品書兼領収書
+				if( dto.isDeliveryReceiptCheckDisp && dto.delborPrintCount.equals("0")){
+					target = true;
+				}
+				
+				if( target ){
+					newList.add(dto);
+				}
+				
+			}
 			
-			boolean target = false;
-			//納品書
-			if( dto.isDeliveryCheckDisp && dto.deliveryPrintCount.equals("0")){
-				target = true;
-			}
-			//仮納品書発行
-			if( dto.isTempDeliveryCheckDisp && dto.tempDeliverySlipFlag.equals("0")){
-				target = true;
-			}
-			//納品書兼領収書
-			if( dto.isDeliveryReceiptCheckDisp && dto.delborPrintCount.equals("0")){
-				target = true;
-			}
-			
-			if( target ){
-				newList.add(dto);
-			}
-			
+			this.outputSalesReportForm.searchResultList = newList;
+			allSearchResultList = newList;
 		}
-		
-		this.outputSalesReportForm.searchResultList = newList;
-		allSearchResultList = newList;
 		
 		
 		
