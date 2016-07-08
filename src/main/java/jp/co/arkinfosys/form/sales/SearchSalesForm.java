@@ -169,7 +169,7 @@ public class SearchSalesForm extends AbstractSearchForm<List<Object>> {
 	/**
 	 * 合計 粗利
 	 */
-	public String gmTotal="1000";
+	public String gmTotal;
 	/**
 	 * 合計 粗利益
 	 */
@@ -187,4 +187,8 @@ public class SearchSalesForm extends AbstractSearchForm<List<Object>> {
 	 */
 	public String total;
 	
+	/**
+	 * エクセル出力
+	 */
+	public boolean outputExcel = false;
 }

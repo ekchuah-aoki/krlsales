@@ -119,3 +119,27 @@
 		</tr>
 	</c:forEach>
 </table>
+<c:choose>
+<c:when test="${outputExcel}">
+<table id="search_result_total" summary="searchResult Total" class="forms detail_info" style="table-layout: auto; margin-top: 20px;">
+<tr>
+<td colspan="5"></td>
+<tr>
+<th colspan="2" class="rd_top_left"  style='text-align:center; cursor: pointer; height:30px;'>粗利益</th>
+<th colspan="2" class="xl64"  style='text-align:center; cursor: pointer; height:30px;'>粗利益率</th>
+<th colspan="2" class="xl64"  style='text-align:center; cursor: pointer; height:30px;'>金額合計</th>
+<th colspan="2" class="xl64"  style='text-align:center; cursor: pointer; height:30px;'>消費税</th>
+<th colspan="2" class="rd_top_right"  style='text-align:center; cursor: pointer; height:30px;'>伝票合計</th>
+</tr>
+<tr>
+<td colspan="2" class="xl66" style="text-align:center">
+	&nbsp;<fmt:formatNumber value="${gmTotal}" pattern="${mineDto.unitPriceDecAlignFormat}" />&nbsp;
+</td>
+<td colspan="2" class="xl67" style="text-align:center">
+	&nbsp;<fmt:formatNumber value="${gmTotalPer}" pattern="${mineDto.numDecAlignFormat}" />&nbsp;
+</td>
+
+</tr>
+</table>
+</c:when>
+</c:choose>

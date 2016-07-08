@@ -8,6 +8,9 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.seasar.framework.beans.util.BeanMap;
+import org.seasar.struts.annotation.ActionForm;
+
 import jp.co.arkinfosys.action.ajax.AbstractSearchResultAjaxAction;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.dto.sales.OutputSalesSearchResultDto;
@@ -16,9 +19,6 @@ import jp.co.arkinfosys.form.sales.OutputSalesReportForm;
 import jp.co.arkinfosys.service.MasterSearch;
 import jp.co.arkinfosys.service.exception.ServiceException;
 import jp.co.arkinfosys.service.sales.SearchOutputSalesReportService;
-
-import org.seasar.framework.beans.util.BeanMap;
-import org.seasar.struts.annotation.ActionForm;
 
 /**
  * 売上帳票発行画面の検索実行アクションクラスです.
@@ -84,6 +84,36 @@ public class SearchOutputSalesReportAjaxAction extends
 	@Override
 	protected void doAfterSearch() throws Exception {
 		List<OutputSalesSearchResultDto> allSearchResultList = this.outputSalesReportForm.searchResultList;
+		
+		//納品書出力不要なのに、納品書出力回数が０で、対象になっているのを消去する
+		List<OutputSalesSearchResultDto> newList = new ArrayList<OutputSalesSearchResultDto>();
+		for( OutputSalesSearchResultDto dto : allSearchResultList){
+			
+			boolean target = false;
+			//納品書
+			if( dto.isDeliveryCheckDisp && dto.deliveryPrintCount.equals("0")){
+				target = true;
+			}
+			//仮納品書発行
+			if( dto.isTempDeliveryCheckDisp && dto.tempDeliverySlipFlag.equals("0")){
+				target = true;
+			}
+			//納品書兼領収書
+			if( dto.isDeliveryReceiptCheckDisp && dto.delborPrintCount.equals("0")){
+				target = true;
+			}
+			
+			if( target ){
+				newList.add(dto);
+			}
+			
+		}
+		
+		this.outputSalesReportForm.searchResultList = newList;
+		allSearchResultList = newList;
+		
+		
+		
 		this.outputSalesReportForm.searchResultCount = allSearchResultList
 				.size();
 

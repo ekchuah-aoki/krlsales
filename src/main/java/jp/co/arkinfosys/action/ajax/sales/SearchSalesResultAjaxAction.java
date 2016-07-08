@@ -3,23 +3,30 @@
  */
 package jp.co.arkinfosys.action.ajax.sales;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
 
+import org.seasar.framework.beans.util.BeanMap;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.struts.annotation.ActionForm;
+import org.seasar.struts.annotation.Execute;
+
+import jp.co.arkinfosys.action.AbstractSearchResultAction;
 import jp.co.arkinfosys.action.ajax.AbstractSearchResultAjaxAction;
+import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
+import jp.co.arkinfosys.common.MessageResourcesUtil;
+import jp.co.arkinfosys.common.NumberUtil;
 import jp.co.arkinfosys.form.AbstractSearchForm;
 import jp.co.arkinfosys.form.sales.SearchSalesForm;
 import jp.co.arkinfosys.service.MasterSearch;
 import jp.co.arkinfosys.service.ROrderService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 import jp.co.arkinfosys.service.sales.SearchSalesService;
-
-import org.seasar.framework.beans.util.BeanMap;
-import org.seasar.struts.annotation.ActionForm;
-import org.seasar.struts.annotation.Execute;
 
 /**
  * 売上検索画面の検索実行アクションクラスです.
@@ -58,7 +65,85 @@ public class SearchSalesResultAjaxAction extends
 		this.searchSalesForm.isInputROrderValid = userDto
 				.isMenuValid(Constants.MENU_ID.INPUT_RORDER);
 	}
+	
+	/**
+	 * {@link AbstractSearchResultAction#doSearch()}検索後に必要な処理を行います.<br>
+	 * 検索結果の合計金額を計算
+	 * @throws Exception
+	 */
+	protected void doAfterSearch() throws Exception {
+	
+		// 検索条件を取得
+		BeanMap params = Beans.createAndCopy(BeanMap.class, this.searchSalesForm)
+				.excludesWhitespace().lrTrim().execute();
+		
+		List<BeanMap> resultList = this.searchSalesService.findSlipByCondition(params);
+		
+		BigDecimal gmTotal = BigDecimal.ZERO;
+		BigDecimal gmTotalPer = BigDecimal.ZERO;
+		BigDecimal priceTotal = BigDecimal.ZERO;
+		BigDecimal ctaxPriceTotal = BigDecimal.ZERO;
+		BigDecimal total = BigDecimal.ZERO;
+		
+		for(BeanMap bean : resultList){
+			gmTotal = gmTotal.add((BigDecimal)bean.get("gmTotal"));
+			priceTotal = priceTotal.add((BigDecimal)bean.get("priceTotal"));
+			ctaxPriceTotal = ctaxPriceTotal.add((BigDecimal)bean.get("ctaxPriceTotal"));
+			total = total.add((BigDecimal)bean.get("slipTotal"));
+		}
 
+		gmTotalPer = gmTotal.divide(priceTotal, 3).multiply(new BigDecimal(100));
+		
+		this.searchSalesForm.gmTotal = this.convertToYenNotation(gmTotal.toString());
+		this.searchSalesForm.gmTotalPer = this.convertToStaNotation(gmTotalPer.toString());
+		this.searchSalesForm.priceTotal = this.convertToYenNotation(priceTotal.toString());
+		this.searchSalesForm.ctaxPriceTotal = this.convertToYenNotation(ctaxPriceTotal.toString());
+		this.searchSalesForm.total = this.convertToYenNotation(total.toString());
+	}
+
+	/**
+	 * 数値文字列を統計形式の数値文字列に変換します.<br>
+	 * 数値は自社マスタで設定する統計小数桁数の桁まで四捨五入されます.また、整数部には3桁毎にカンマが挿入されます.
+	 *
+	 * @param l_string 数値文字列
+	 * @return 統計形式の数値文字列
+	 */
+	private String convertToStaNotation(String l_string) {
+		String temp = "";
+		// 統計な端数処理
+		DecimalFormat df = NumberUtil.createDecimalFormat(
+				CategoryTrns.FLACT_CATEGORY_HALF_UP,
+				super.mineDto.statsDecAlignment, true);
+		try {
+			temp = df.format(new BigDecimal(l_string));
+		} catch (Exception e) {
+		}
+		return temp;
+	}
+	
+	/**
+	 * 数値文字列を￥記号付きの金額表示文字列に変換します.<br>
+	 * 3桁毎にカンマが挿入され、文字列の先頭には￥記号が付与されます.
+	 *
+	 * @param l_string 数値文字列
+	 * @return ￥記号付き金額文字列
+	 */
+	private String convertToYenNotation(String l_string) {
+		String temp = "";
+		// 円金額な端数処理
+		DecimalFormat df = NumberUtil.createDecimalFormat(
+				super.mineDto.priceFractCategory, 0, true);
+		try {
+			temp = df.format(new BigDecimal(l_string));
+			if (temp.length() != 0) {
+				temp = MessageResourcesUtil
+						.getMessage("words.unit.japaneseYen")
+						+ " " + temp;
+			}
+		} catch (Exception e) {
+		}
+		return temp;
+	}		
 	/**
 	 * 検索条件を受け取って検索結果件数を返します.
 	 * @param params 検索条件

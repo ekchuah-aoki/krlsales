@@ -151,6 +151,7 @@ public abstract class AbstractSearchResultAction<DTOCLASS, ENTITY> extends
 	protected List<ENTITY> execSearch(BeanMap params, String sortColumn,
 			boolean sortOrderAsc, int rowCount, int offset)
 			throws ServiceException {
+		
 		return this.getService().findByConditionLimit(params, sortColumn,
 				sortOrderAsc, rowCount, offset);
 	}

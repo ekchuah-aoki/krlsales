@@ -13,6 +13,13 @@
 		var targetTmp = null;
 		var data = null;
 		var paramDataTmp = null;
+		
+		// 粗利益率の丸め（桁=自社マスタ.統計少数桁、丸め=四捨五入固定）
+		var rateAlignment = ${mineDto.statsDecAlignment};
+		var taxFractCategory = ${mineDto.taxFractCategory};
+		var priceFractCategory = ${mineDto.priceFractCategory};
+		var rateCategory = scale_half_up;
+		var priceAlignment = scale_0;
 
 		// ページ読込時の動作
 		function init() {
@@ -26,18 +33,6 @@
 				onF2();
 			}
 			
-			// 粗利益 gmTotal
-			_after_load($("#gmTotal").val());
-			/*
-			// 粗利益率 gmTotalPer
-			applyNumeralStylesToObj(rateCategory,rateAlignment,$("#gmTotalPer"));
-			// 金額合計 priceTotal
-			applyNumeralStylesToObj($("#priceFractCategory").val(),priceAlignment,$("#priceTotal"));
-			// 消費税 ctaxPriceTotal
-			applyNumeralStylesToObj($("#taxFractCategory").val(),priceAlignment,$("#ctaxPriceTotal"));
-			// 伝票合計 total
-			applyNumeralStylesToObj($("#priceFractCategory").val(),priceAlignment,$("#total"));
-			*/
 			
 		}
 
@@ -141,6 +136,8 @@
 
 			// 検索を実行する
 			execSearch(data);
+
+			
 		}
 
 		// EXCEL
@@ -239,8 +236,60 @@
 						paramDataTmp = paramData;
 
 						$("#btnF3").attr("disabled","");
+						
+						//合計数値のフォーマット
+						// 粗利益 gmTotal
+						$("#gmTotal").html($("#searchResult_gmTotal").val());
+						// 粗利益率 gmTotalPer
+						$("#gmTotalPer").html($("#searchResult_gmTotalPer").val()+"%");
+						// 金額合計 priceTotal
+						$("#priceTotal").html($("#searchResult_priceTotal").val());
+						// 消費税 ctaxPriceTotal
+						$("#ctaxPriceTotal").html($("#searchResult_ctaxPriceTotal").val());
+						// 伝票合計 total
+						$("#total").html($("#searchResult_total").val());
+						
+						/*
+						// 粗利益 gmTotal
+						$("#gmTotal").val($("#searchResult_gmTotal").val());
+						applyNumeralStylesToObj(priceFractCategory,priceAlignment,$("#gmTotal"));
+						$("#gmTotal").valueBDC($("#gmTotal").val());
+
+						// 粗利益率 gmTotalPer
+						$("#gmTotalPer").val($("#searchResult_gmTotalPer").val());
+						applyNumeralStylesToObj(rateCategory,rateAlignment,$("#gmTotalPer"));
+						$("#gmTotalPer").valueBDC($("#gmTotalPer").val());
+						$("#gmTotalPer").html($("#gmTotalPer").html()+"%");
+
+
+						// 金額合計 priceTotal
+						$("#priceTotal").val($("#searchResult_priceTotal").val());
+						applyNumeralStylesToObj(priceFractCategory,priceAlignment,$("#priceTotal"));
+						$("#priceTotal").valueBDC($("#priceTotal").val());
+
+						// 消費税 ctaxPriceTotal
+						$("#ctaxPriceTotal").val($("#searchResult_ctaxPriceTotal").val());
+						applyNumeralStylesToObj(priceFractCategory,priceAlignment,$("#ctaxPriceTotal"));
+						$("#ctaxPriceTotal").valueBDC($("#ctaxPriceTotal").val());
+
+						// 伝票合計 total
+						$("#total").val($("#searchResult_total").val());
+						applyNumeralStylesToObj(priceFractCategory,priceAlignment,$("#total"));
+						$("#total").valueBDC($("#total").val());
+						*/
+						
 					} else {
 						$("#btnF3").attr("disabled","disabled");
+						// 粗利益 gmTotal
+						$("#gmTotal").valueBDC('');
+						// 粗利益率 gmTotalPer
+						$("#gmTotalPer").valueBDC('');
+						// 金額合計 priceTotal
+						$("#priceTotal").valueBDC('');
+						// 消費税 ctaxPriceTotal
+						$("#ctaxPriceTotal").valueBDC('');
+						// 伝票合計 total
+						$("#total").valueBDC('');
 					}
 				},
 				function(xmlHttpRequest, textStatus, errorThrown) {
@@ -537,19 +586,19 @@
 				</tr>
 				<tr>
 					<td id="gmTotal" style="text-align: center; height: 100px;" class="BDCyen yen_value">
-						&nbsp;<c:out value="${f:h(gmTotal)}" />
+						
 					</td>
 					<td id="gmTotalPer" style="text-align: center" class="numeral_commas">
-						&nbsp;<c:out value="${f:h(gmTotalPer)}" />
+						
 					</td>
 					<td id="priceTotal" style="text-align: center" class="BDCyen yen_value">
-						&nbsp;<c:out value="${f:h(priceTotal)}" />
+						
 					</td>
 					<td id="ctaxPriceTotal" style="text-align: center" class="BDCyen yen_value">
-						&nbsp;<c:out value="${f:h(ctaxPriceTotal)}" />
+						
 					</td>
 					<td id="total" style="text-align: center" class="BDCyen yen_value">
-						&nbsp;<c:out value="${f:h(total)}" />
+						
 					</td>
 				</tr>
 			</table>
