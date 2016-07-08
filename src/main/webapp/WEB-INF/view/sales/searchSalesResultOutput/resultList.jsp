@@ -133,10 +133,19 @@
 </tr>
 <tr>
 <td colspan="2" class="xl66" style="text-align:center">
-	&nbsp;<fmt:formatNumber value="${gmTotal}" pattern="${mineDto.unitPriceDecAlignFormat}" />&nbsp;
+	&nbsp;${gmTotal}&nbsp;
 </td>
-<td colspan="2" class="xl67" style="text-align:center">
-	&nbsp;<fmt:formatNumber value="${gmTotalPer}" pattern="${mineDto.numDecAlignFormat}" />&nbsp;
+<td colspan="2" class="xl66" style="text-align:center">
+	&nbsp;${gmTotalPer}&#37;&nbsp;
+</td>
+<td colspan="2" class="xl66" style="text-align:center">
+	&nbsp;${priceTotal}&nbsp;
+</td>
+<td colspan="2" class="xl66" style="text-align:center">
+	&nbsp;${ctaxPriceTotal}&nbsp;
+</td>
+<td colspan="2" class="xl66" style="text-align:center">
+	&nbsp;${total}&nbsp;
 </td>
 
 </tr>
