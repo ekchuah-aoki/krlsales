@@ -54,4 +54,5 @@ public class SupplierLineTrn implements Serializable {
 	public String updFunc;
 	public Timestamp updDatetm;
 	public String updUser;
+	public Date madeDate;	
 }

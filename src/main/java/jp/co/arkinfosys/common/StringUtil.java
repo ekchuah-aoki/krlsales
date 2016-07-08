@@ -6,6 +6,7 @@ package jp.co.arkinfosys.common;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.validator.DateValidator;
 
@@ -338,4 +339,22 @@ public final class StringUtil {
 
    }
 
+  /**
+   * 配列連結
+   * @param xs 連結する配列
+   * @param separator 連結文字
+   * @return
+   */
+  public static String join(List<String> xs, String separator) {
+	  String[] array = xs.toArray(new String[0]);
+	  StringBuilder buf = new StringBuilder();
+	  for(int i = 0; i < array.length; i++) {
+	    buf.append(array[i]);
+	    if (i != array.length-1) {
+	      buf.append(separator);
+	    }
+	  }
+	  return buf.toString();
+	}  
+  
 }

@@ -25,5 +25,6 @@ UPDATE
 		,UPD_FUNC=/*updFunc*/NULL
 		,UPD_DATETM=now()
 		,UPD_USER=/*updUser*/NULL
+		,MADE_DATE=/*madeDate*/NULL
 	WHERE
 		SUPPLIER_LINE_ID=/*supplierLineId*/0

@@ -654,6 +654,8 @@ public class InputPurchaseAction extends AbstractSlipEditAction<PurchaseSlipDto,
 				.getMessage("labels.dolPrice");
 		String labelSupplierDate = MessageResourcesUtil
 				.getMessage("labels.supplierDate");// 仕入日
+		String labelMadeDate = MessageResourcesUtil
+				.getMessage("labels.madeDate");
 
 		boolean inputLine = false;
 
@@ -713,6 +715,13 @@ public class InputPurchaseAction extends AbstractSlipEditAction<PurchaseSlipDto,
 					}
 				}
 			}
+			//製造年月日
+			if (!StringUtil.hasLength(supplierLineTrnDto.madeDate)) {
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+						"errors.line.required",
+						supplierLineTrnDto.lineNo, labelMadeDate));
+			}
+			
 			//レートで国内外判断
 			if(inputPurchaseForm.rateId == null || inputPurchaseForm.rateId.length() == 0){
 			// 円単価
@@ -908,6 +917,16 @@ public class InputPurchaseAction extends AbstractSlipEditAction<PurchaseSlipDto,
 							new ActionMessage("errors.line.product.set",supplierLineTrnDto.lineNo));
 				}
 			}
+			
+			// 製造年月日の未来日チェック
+			Boolean madeDateFutureCheck = ValidateUtil.dateIsFuture(supplierLineTrnDto.madeDate);
+			if( madeDateFutureCheck != null && madeDateFutureCheck == true ) {
+
+				errors.add(ActionMessages.GLOBAL_MESSAGE, new ActionMessage(
+						"errors.dateFuture", labelMadeDate,
+						supplierLineTrnDto.madeDate));
+			}
+			
 		}
 		// 明細行が1行以上、存在するかどうか
 		if (!inputLine) {

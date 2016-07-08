@@ -105,6 +105,7 @@ public class SupplierSlipService extends AbstractSlipService<SupplierSlipTrn,Pur
 		public static final String PAYMENT_LINE_ID = "paymentLineId";
 
 		public static final String REST_QUANTITY = "restQuantity"; // 発注伝票明細　残数
+		public static final String MADE_DATE = "madeDate";
 
 		// 作業用
 		public static final String COND_ORDERED = "condOrderd"; // 発注

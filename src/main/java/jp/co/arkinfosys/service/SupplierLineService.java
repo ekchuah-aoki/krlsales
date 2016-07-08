@@ -451,6 +451,7 @@ public class SupplierLineService extends AbstractLineService<SupplierLineTrn,Pur
 		param
 				.put(SupplierSlipService.Param.PAYMENT_LINE_ID,
 						line.paymentLineId); // 支払伝票行ID
+		param.put(SupplierSlipService.Param.MADE_DATE, line.madeDate); // 製造年月日
 		return param;
 	}
 

@@ -40,7 +40,8 @@ public class PurchaseLineDto extends AbstractLineDto {
     public String rackName;
     public String poLineId;
     public String paymentLineId;
-
+    public String madeDate;
+    
     public String creFunc;
     public Timestamp creDatetm;
     public String creUser;
@@ -51,9 +52,7 @@ public class PurchaseLineDto extends AbstractLineDto {
     public String oldQuantity;
     public String restQuantity;
     public String totalQuantity;
-    
-    public String madeDate;
-
+ 
     @Override
     public String toString() {
     	return warehouseName;
