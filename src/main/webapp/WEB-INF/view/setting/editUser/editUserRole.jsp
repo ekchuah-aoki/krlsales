@@ -1,7 +1,17 @@
-<th><div class="col_title_right">${bean.caption}</div></th>
+<th>
+<c:if test="${bean.menuId != '1301'}">
+<div class="col_title_right">${bean.caption}</div>
+</c:if>
+</th>
 <td>
 	<%-- ファイル参照以外 --%>
 	<c:if test="${bean.menuId != '1407'}">
+	<%--セット商品は無効 --%>
+	<c:choose>
+	<c:when test="${bean.menuId == '1301'}">
+		<input type="hidden" id="menuDtoList[${status.index}].validFlag1" value="0">  
+	</c:when>
+	<c:otherwise>
 	<input type="radio"
 		id="menuDtoList[${status.index}].validFlag1"
 		name="menuDtoList[${status.index}].validFlag" value="0"
@@ -21,6 +31,8 @@
 		tabindex="${status.index + 200}" <c:if test="${bean.validFlag=='1'}">checked</c:if> >
 		<label for="menuDtoList[${status.index}].validFlag3">参照</label>
 	</c:if>
+	</c:otherwise>
+	</c:choose>
 	</c:if>
 
 	<%-- ファイル参照 --%>
