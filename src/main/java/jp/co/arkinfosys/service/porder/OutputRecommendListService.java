@@ -302,7 +302,9 @@ public class OutputRecommendListService extends AbstractService<PoSlipTrn> {
 			}
 
 			//検索する
-			List<ProductStockInfoDto> stockInfoList = productService.aggregateProductStockInfoByCondition(map, sortColumn, sortOrderAsc);
+			ArrayList<String> sortColumnList = new ArrayList<String>();
+			sortColumnList.add(sortColumn);
+			List<ProductStockInfoDto> stockInfoList = productService.aggregateProductStockInfoByCondition(map,sortColumnList, sortOrderAsc);
 
 			for(ProductStockInfoDto productStockInfoDto: stockInfoList){
 

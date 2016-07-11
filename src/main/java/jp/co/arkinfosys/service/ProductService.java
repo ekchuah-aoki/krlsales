@@ -740,6 +740,234 @@ public class ProductService extends
 			param.put(ProductService.Param.SORT_ORDER, Constants.SQL.DESC);
 		}
 	}
+	
+	/**
+	 * 集計処理用の検索条件を設定します.
+	 * @param conditions 検索条件値のマップ
+	 * @param sortColumnList ソートカラム名
+	 * @param sortOrderAsc 昇順にソートするか否か
+	 * @param param 検索条件のマップ
+	 */
+	
+	
+	private void setConditionAggregate(Map<String, Object> conditions,
+			ArrayList<String> sortColumnList, boolean sortOrderAsc, Map<String, Object> param) {
+		// 商品コード(完全一致)
+		if (conditions.containsKey(ProductService.Param.PRODUCT_CODE)) {
+			param.put(ProductService.Param.PRODUCT_CODE, conditions
+					.get(ProductService.Param.PRODUCT_CODE));
+		}
+
+		// 仕入先商品コード
+		if (conditions.containsKey(ProductService.Param.SUPPLIER_PCODE)) {
+			param.put(ProductService.Param.SUPPLIER_PCODE, super
+					.createPrefixSearchCondition((String) conditions
+							.get(ProductService.Param.SUPPLIER_PCODE)));
+		}
+
+		// JANコード
+		if (conditions.containsKey(ProductService.Param.JAN_PCODE)) {
+			param.put(ProductService.Param.JAN_PCODE, super
+					.createPrefixSearchCondition((String) conditions
+							.get(ProductService.Param.JAN_PCODE)));
+		}
+
+		// 商品名
+		if (conditions.containsKey(ProductService.Param.PRODUCT_NAME)) {
+			param.put(ProductService.Param.PRODUCT_NAME, super
+					.createPartialSearchCondition((String) conditions
+							.get(ProductService.Param.PRODUCT_NAME)));
+		}
+
+		// 商品名カナ
+		if (conditions.containsKey(ProductService.Param.PRODUCT_KANA)) {
+			param.put(ProductService.Param.PRODUCT_KANA, super
+					.createPartialSearchCondition((String) conditions
+							.get(ProductService.Param.PRODUCT_KANA)));
+		}
+
+		// 仕入先コード(完全一致)
+		if (conditions.containsKey(ProductService.Param.SUPPLIER_CODE)) {
+			param.put(ProductService.Param.SUPPLIER_CODE, conditions
+					.get(ProductService.Param.SUPPLIER_CODE));
+		}
+
+		// 仕入先名
+		if (conditions.containsKey(ProductService.Param.SUPPLIER_NAME)) {
+			param.put(ProductService.Param.SUPPLIER_NAME, super
+					.createPartialSearchCondition((String) conditions
+							.get(ProductService.Param.SUPPLIER_NAME)));
+		}
+
+		// セット分類
+		if (conditions.containsKey(ProductService.Param.SET_TYPE_CATEGORY)) {
+			param.put(ProductService.Param.SET_TYPE_CATEGORY, conditions
+					.get(ProductService.Param.SET_TYPE_CATEGORY));
+		}
+
+		// 標準化分類
+		if (conditions
+				.containsKey(ProductService.Param.PRODUCT_STANDARD_CATEGORY)) {
+			param
+					.put(
+							ProductService.Param.PRODUCT_STANDARD_CATEGORY,
+							conditions
+									.get(ProductService.Param.PRODUCT_STANDARD_CATEGORY));
+		}
+
+		// 分類保管
+		if (conditions.containsKey(ProductService.Param.PRODUCT_STOCK_CATEGORY)) {
+			param.put(ProductService.Param.PRODUCT_STOCK_CATEGORY, conditions
+					.get(ProductService.Param.PRODUCT_STOCK_CATEGORY));
+		}
+
+		// 分類状況
+		if (conditions
+				.containsKey(ProductService.Param.PRODUCT_STATUS_CATEGORY)) {
+			param.put(ProductService.Param.PRODUCT_STATUS_CATEGORY, conditions
+					.get(ProductService.Param.PRODUCT_STATUS_CATEGORY));
+		}
+
+		// 在庫管理
+		if (conditions.containsKey(ProductService.Param.STOCK_CTL_CATEGORY)) {
+			param.put(ProductService.Param.STOCK_CTL_CATEGORY, conditions
+					.get(ProductService.Param.STOCK_CTL_CATEGORY));
+		}
+
+		if (conditions.containsKey(ProductService.Param.RACK_MULTI_FLAG)) {
+			param.put(ProductService.Param.RACK_MULTI_FLAG, conditions
+					.get(ProductService.Param.RACK_MULTI_FLAG));
+		}
+
+		// 備考
+		if (conditions.containsKey(ProductService.Param.REMARKS)) {
+			param.put(ProductService.Param.REMARKS, super
+					.createPartialSearchCondition((String) conditions
+							.get(ProductService.Param.REMARKS)));
+		}
+
+		// 商品分類（大）
+		if (conditions.containsKey(ProductService.Param.PRODUCT1)) {
+			param.put(ProductService.Param.PRODUCT1, conditions
+					.get(ProductService.Param.PRODUCT1));
+		}
+
+		// 商品分類（中）
+		if (conditions.containsKey(ProductService.Param.PRODUCT2)) {
+			param.put(ProductService.Param.PRODUCT2, conditions
+					.get(ProductService.Param.PRODUCT2));
+		}
+
+		// 商品分類（小）
+		if (conditions.containsKey(ProductService.Param.PRODUCT3)) {
+			param.put(ProductService.Param.PRODUCT3, conditions
+					.get(ProductService.Param.PRODUCT3));
+		}
+
+		// 補充発注用の保有数＜＝発注点条件を付加するかどうか
+		if (conditions
+				.containsKey(ProductService.Param.HOLDING_STOCK_LESS_THAN_PO_NUM)) {
+			param
+					.put(
+							ProductService.Param.HOLDING_STOCK_LESS_THAN_PO_NUM,
+							conditions
+									.get(ProductService.Param.HOLDING_STOCK_LESS_THAN_PO_NUM));
+		}
+
+		// 委託在庫数 ＝ 0
+		if (conditions.containsKey(ProductService.Param.ENTRUST_STOCK_ZERO)) {
+			param.put(ProductService.Param.ENTRUST_STOCK_ZERO, conditions
+					.get(ProductService.Param.ENTRUST_STOCK_ZERO));
+		}
+
+		// 委託在庫数＞＝1
+		if (conditions
+				.containsKey(ProductService.Param.ENTRUST_STOCK_LARGER_THAN_ZERO)) {
+			param
+					.put(
+							ProductService.Param.ENTRUST_STOCK_LARGER_THAN_ZERO,
+							conditions
+									.get(ProductService.Param.ENTRUST_STOCK_LARGER_THAN_ZERO));
+		}
+
+		// 委託在庫の発注量 > 0
+		if (conditions
+				.containsKey(ProductService.Param.ENTRUST_PORDER_QUANTITY_LARGER_THAN_ZERO)) {
+			param
+					.put(
+							ProductService.Param.ENTRUST_PORDER_QUANTITY_LARGER_THAN_ZERO,
+							conditions
+									.get(ProductService.Param.ENTRUST_PORDER_QUANTITY_LARGER_THAN_ZERO));
+		}
+
+		// 保有数0の商品は除く
+		if (conditions
+				.containsKey(ProductService.Param.EXCLUDES_HOLDING_STOCK_ZERO)) {
+			param
+					.put(
+							ProductService.Param.EXCLUDES_HOLDING_STOCK_ZERO,
+							conditions
+									.get(ProductService.Param.EXCLUDES_HOLDING_STOCK_ZERO));
+		}
+
+		// 平均出荷数0の商品は除く
+		if (conditions
+				.containsKey(ProductService.Param.EXCLUDES_AVG_SHIP_COUNT_ZERO)) {
+			param
+					.put(
+							ProductService.Param.EXCLUDES_AVG_SHIP_COUNT_ZERO,
+							conditions
+									.get(ProductService.Param.EXCLUDES_AVG_SHIP_COUNT_ZERO));
+		}
+
+		// 保有数 > 平均出荷数 となる商品は除く
+		if (conditions
+				.containsKey(ProductService.Param.EXCLUDES_AVG_LESS_THAN_HOLDING_STOCK)) {
+			param
+					.put(
+							ProductService.Param.EXCLUDES_AVG_LESS_THAN_HOLDING_STOCK,
+							conditions
+									.get(ProductService.Param.EXCLUDES_AVG_LESS_THAN_HOLDING_STOCK));
+		}
+
+		// 検索結果に発注情報を追加する
+		if (conditions.containsKey(ProductService.Param.ADD_PORDER_INFO)) {
+			param.put(ProductService.Param.ADD_PORDER_INFO, conditions
+					.get(ProductService.Param.ADD_PORDER_INFO));
+		}
+
+		// ソートカラム
+		 
+		if (sortColumnList.size()>=1) {
+			ArrayList<String> sortColumnList1 = new ArrayList<String>();
+			for(int i = 0;i < sortColumnList.size(); i++){
+				//取得
+				String str = sortColumnList.get(i);
+				//カラム名に変換
+				str = StringUtil.convertColumnName(str);
+				//変数に加える
+				sortColumnList1.add(str);
+				
+			}
+			
+			String scl = StringUtil.join(sortColumnList1,",");
+			
+			 
+			param.put(ProductService.Param.SORT_COLUMN, scl);
+			
+		}
+			/*param.put(ProductService.Param.SORT_COLUMN, StringUtil
+			.convertColumnName(sortColumnList));
+			*/
+		
+		// ソートオーダーを設定する
+		if (sortOrderAsc) {
+			param.put(ProductService.Param.SORT_ORDER, Constants.SQL.ASC);
+		} else {
+			param.put(ProductService.Param.SORT_ORDER, Constants.SQL.DESC);
+		}
+	}
+	
 
 	/**
 	 * 空の検索条件マップを作成します.
@@ -1449,11 +1677,13 @@ public class ProductService extends
 	 */
 	public List<ProductStockInfoDto> aggregateProductStockInfoByCondition(
 			Map<String, Object> conditions) throws ServiceException {
-
-		return aggregateProductStockInfoByCondition(conditions,
-				Param.PRODUCT_CODE, true);
+		ArrayList<String> scl2 = new ArrayList<String>();
+		scl2.add(Param.PRODUCT_CODE);
+		scl2.add(Param.RACK_CODE);
+		return aggregateProductStockInfoByCondition(conditions,scl2
+				, true);
 	}
-
+	
 	/**
 	 * 検索条件およびソート条件を指定して、商品の在庫情報のリストを返します.
 	 * @param conditions 検索条件のマップ
@@ -1463,7 +1693,7 @@ public class ProductService extends
 	 * @throws ServiceException
 	 */
 	public List<ProductStockInfoDto> aggregateProductStockInfoByCondition(
-			Map<String, Object> conditions, String sortColumn,
+			Map<String, Object> conditions, ArrayList<String> sortColumn,
 			boolean sortOrderAsc) throws ServiceException {
 		try {
 			Map<String, Object> param = super.createSqlParam();
@@ -1598,4 +1828,9 @@ public class ProductService extends
 	protected String getTableName() {
 		return ProductJoin.TABLE_NAME;
 	}
+	
+	
+
 }
+
+
