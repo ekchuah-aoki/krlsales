@@ -304,7 +304,7 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 	 * @return 採番した伝票番号(未登録の場合はnull)
 	 * @throws ServiceException
 	 */
-	public String insert(PurchaseSlipDto sstd)
+	public String insert(PurchaseSlipDto sstd) 
 			throws ServiceException {
 		try {
 			EadSlipTrnDto eadSlipTrnDto = new EadSlipTrnDto();

@@ -41,6 +41,8 @@ public class PurchaseLineDto extends AbstractLineDto {
     public String poLineId;
     public String paymentLineId;
     public String madeDate;
+    public String oldMadeDate;
+    public boolean updateMadeDate;
     
     public String creFunc;
     public Timestamp creDatetm;

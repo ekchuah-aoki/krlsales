@@ -689,6 +689,21 @@
 			}
 		);
 	}
+	
+	//製造年月日入力可／不可
+	function madeDateDisabledChanged(id){
+		
+		console.debug($("#"+selectorEscape("lineDtoList["+id+"].updateMadeDate")).attr("checked"));
+		
+		if($("#"+selectorEscape("lineDtoList["+id+"].updateMadeDate")).attr("checked") == true) {
+			$("#"+selectorEscape("lineDtoList["+id+"].madeDate_input_area")).css("display", "inline");
+			$("#"+selectorEscape("lineDtoList["+id+"].madeDate_disable_area")).css("display", "none");
+		} else {
+			$("#"+selectorEscape("lineDtoList["+id+"].madeDate_input_area")).css("display", "none");
+			$("#"+selectorEscape("lineDtoList["+id+"].madeDate_disable_area")).css("display", "inline");
+		}
+	}
+	
 
 	// 外貨記号の初期値を設定する(仕入先に設定されたレートから取得)
 	CurrencyUnitClassNameHashList["dollar_value"] = "${sign}";
@@ -910,6 +925,7 @@
 									<html:hidden name="lineDtoList" property="restQuantity" indexed="true" styleId="lineDtoList[${status.index}].restQuantity" />
 									<html:hidden name="lineDtoList" property="totalQuantity" indexed="true" styleId="lineDtoList[${status.index}].totalQuantity" />
 									<html:hidden name="lineDtoList" property="supplierDetailCategory" indexed="true" styleId="lineDtoList[${status.index}].supplierDetailCategory" value="01"/>
+									<html:hidden name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].oldMadeDate"/>
 									<br>
 								</td>
 
@@ -978,7 +994,32 @@
 										<html:text name="lineDtoList" property="price" indexed="true" styleId="lineDtoList[${status.index}].price" styleClass="AutoCalcPrice numeral_commas yen_value" style="width:43%; height: 30px; margin:10px 10px 0;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
 									</div>
 									<div class="box_3of3" style="height: 50px;">
-										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10" />
+										<c:choose>
+										<c:when test="${f:h(newData)}" >
+										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+										</c:when>
+										<c:otherwise>
+											<html:checkbox name="lineDtoList" property="updateMadeDate" indexed="true" styleId="lineDtoList[${status.index}].updateMadeDate" tabindex="<%=String.valueOf(lineTab++) %>" style="width: 25px; height: 25px; vertical-align: middle;"  onclick="madeDateDisabledChanged('${status.index}')"/>
+											<c:choose>
+											<c:when test="${f:h(lineDtoList.updateMadeDate)}" >
+												<div style="display:inline" id="lineDtoList[${status.index}].madeDate_input_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+												</div>
+												<div style="display:none" id="lineDtoList[${status.index}].madeDate_disable_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div style="display:none" id="lineDtoList[${status.index}].madeDate_input_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+												</div>
+												<div style="display:inline" id="lineDtoList[${status.index}].madeDate_disable_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												</div>
+											</c:otherwise>
+											</c:choose>
+										</c:otherwise>
+										</c:choose>
 										<html:hidden name="lineDtoList" property="dolUnitPrice" styleId="lineDtoList[${status.index}].dolUnitPrice" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" />
 										<html:hidden name="lineDtoList" property="dolPrice"  styleId="lineDtoList[${status.index}].dolPrice" styleClass="AutoCalcDolPrice numeral_commas dollar_value" style="width:43%; margin:10px 10px 0; height:30px;"  />
 									<!-- 
