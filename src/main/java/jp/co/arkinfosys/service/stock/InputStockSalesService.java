@@ -422,6 +422,10 @@ public class InputStockSalesService extends AbstractService<EadSlipTrn> {
 			// もし、更新・新規追加対象の入出庫明細が存在しない場合、伝票を削除する。存在すれば伝票を更新する
 			if(updateLineTrnList.size() == 0 && newLineTrnList.size() == 0) {
 				eadService.deleteSlipByEadSlipId(eadSlipTrn.eadSlipId);
+				
+				//入出庫製造年月日明細の削除
+				this.eadService.deleteMadeDateByEadSlipId(eadSlipTrn.eadSlipId);
+				
 			} else {
 				// 入出庫年度、月度、年月度を計算
 				YmDto ymDto = ymService.getYm(dto.salesDate);
@@ -475,6 +479,10 @@ public class InputStockSalesService extends AbstractService<EadSlipTrn> {
 
 			// 入出庫伝票の削除
 			this.eadService.deleteSlipByEadSlipId(eadSlipTrn.eadSlipId);
+			
+			//入出庫製造年月日明細の削除
+			this.eadService.deleteMadeDateByEadSlipId(eadSlipTrn.eadSlipId);
+			
 		} catch (Exception e) {
 			ServiceException se = new ServiceException(e);
 			se.setStopOnError(true);

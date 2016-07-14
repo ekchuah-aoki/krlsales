@@ -184,7 +184,7 @@ public class SupplierLineService extends AbstractLineService<SupplierLineTrn,Pur
 				}
 
 				//AOKI 製造年月日は、入力した値が前回より古い場合のみ更新
-				if( lineDto.updateMadeDate && !lineDto.oldMadeDate.equals("") && lineDto.updateMadeDate ){
+				if( !lineDto.updateMadeDate && !lineDto.oldMadeDate.equals("") && lineDto.updateMadeDate ){
 					lineDto.madeDate = lineDto.oldMadeDate;
 				}
 				

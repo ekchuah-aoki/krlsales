@@ -1,5 +1,5 @@
 <th>
-<c:if test="${bean.menuId != '1301'}">
+<c:if test="${bean.menuId != '1301' && bean.menuId != '0603' && bean.menuId != '0604'}">
 <div class="col_title_right">${bean.caption}</div>
 </c:if>
 </th>
@@ -8,7 +8,7 @@
 	<c:if test="${bean.menuId != '1407'}">
 	<%--セット商品は無効 --%>
 	<c:choose>
-	<c:when test="${bean.menuId == '1301'}">
+	<c:when test="${bean.menuId == '1301' || bean.menuId == '0603' || bean.menuId == '0604'}">
 		<input type="hidden" id="menuDtoList[${status.index}].validFlag1" value="0">  
 	</c:when>
 	<c:otherwise>

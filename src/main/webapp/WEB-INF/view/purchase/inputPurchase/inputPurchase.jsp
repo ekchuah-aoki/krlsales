@@ -925,7 +925,6 @@
 									<html:hidden name="lineDtoList" property="restQuantity" indexed="true" styleId="lineDtoList[${status.index}].restQuantity" />
 									<html:hidden name="lineDtoList" property="totalQuantity" indexed="true" styleId="lineDtoList[${status.index}].totalQuantity" />
 									<html:hidden name="lineDtoList" property="supplierDetailCategory" indexed="true" styleId="lineDtoList[${status.index}].supplierDetailCategory" value="01"/>
-									<html:hidden name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].oldMadeDate"/>
 									<br>
 								</td>
 
@@ -996,7 +995,7 @@
 									<div class="box_3of3" style="height: 50px;">
 										<c:choose>
 										<c:when test="${f:h(newData)}" >
-										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
 										</c:when>
 										<c:otherwise>
 											<html:checkbox name="lineDtoList" property="updateMadeDate" indexed="true" styleId="lineDtoList[${status.index}].updateMadeDate" tabindex="<%=String.valueOf(lineTab++) %>" style="width: 25px; height: 25px; vertical-align: middle;"  onclick="madeDateDisabledChanged('${status.index}')"/>
@@ -1006,7 +1005,7 @@
 												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
 												</div>
 												<div style="display:none" id="lineDtoList[${status.index}].madeDate_disable_area">
-												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												<html:text name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
 												</div>
 											</c:when>
 											<c:otherwise>
@@ -1014,7 +1013,7 @@
 												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
 												</div>
 												<div style="display:inline" id="lineDtoList[${status.index}].madeDate_disable_area">
-												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												<html:text name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
 												</div>
 											</c:otherwise>
 											</c:choose>
@@ -1039,8 +1038,10 @@
 									</div>
 									<div class="box_3of3" style="height: 50px; background-color: #fae4eb;">
 										<html:text name="lineDtoList" property="rackCode" indexed="true" styleId="lineDtoList[${status.index}].rackCode" style="width: 80%; height: 30px; ime-mode: disabled; vertical-align: middle; margin:10px 0;"  tabindex="<%=String.valueOf(lineTab++) %>"
-										onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ changeRackCode(this); }" />
+										onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ changeRackCode(this); }" readonly="true" styleClass="c_disable"/>
+										<!-- 
 										<html:image src="${f:url('/images/customize/btn_search.png')}" styleId="rackCodeImg${status.index}" style="margin: 0; padding: 0; width: 26px; height: 26px; vertical-align: middle; cursor: pointer;" tabindex="<%=String.valueOf(lineTab++) %>" />
+										 -->
 									</div>
 								</td>
 

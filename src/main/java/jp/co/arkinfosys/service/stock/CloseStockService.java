@@ -4,9 +4,10 @@
 package jp.co.arkinfosys.service.stock;
 
 import java.math.BigDecimal;
-import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,7 @@ import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.YmDto;
 import jp.co.arkinfosys.entity.EadSlipTrn;
+import jp.co.arkinfosys.entity.ProductMadeDateStockTrn;
 import jp.co.arkinfosys.entity.ProductStockTrn;
 import jp.co.arkinfosys.entity.join.EadSlipLineJoin;
 import jp.co.arkinfosys.service.AbstractService;
@@ -217,8 +219,18 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 			Map<Integer, EadSlipTrn> result = new HashMap<Integer, EadSlipTrn>();
 
 			BigDecimal lastStockNum = BigDecimal.ZERO;
+			
+			Map<Date, BigDecimal> madeDateStockNum = new HashMap<Date, BigDecimal>();
+			
 			if(lastProductStock != null) {
 				lastStockNum = lastProductStock.stockNum;
+				
+				//製造年月日別在庫情報を取得
+				List<ProductMadeDateStockTrn> adeDateStockList = productStockService.findProductMadeDateStockTrn(lastProductStock);
+				for(ProductMadeDateStockTrn dto : adeDateStockList){
+					madeDateStockNum.put(dto.madeDate, dto.stockNum);
+				}
+				
 			}
 
 			// 商品毎の在庫数を取得

@@ -8,20 +8,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.seasar.framework.beans.util.BeanMap;
+import org.seasar.framework.beans.util.Beans;
+
 import jp.co.arkinfosys.common.Categories;
 import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.stock.EadLineTrnDto;
+import jp.co.arkinfosys.dto.stock.EadMadeDateTrnDto;
 import jp.co.arkinfosys.dto.stock.EadSlipTrnDto;
 import jp.co.arkinfosys.entity.EadLineTrn;
+import jp.co.arkinfosys.entity.EadMadeDateTrn;
 import jp.co.arkinfosys.entity.EadSlipTrn;
 import jp.co.arkinfosys.entity.join.EadSlipLineJoin;
 import jp.co.arkinfosys.entity.join.StockQuantity;
 import jp.co.arkinfosys.service.exception.ServiceException;
-
-import org.seasar.framework.beans.util.BeanMap;
-import org.seasar.framework.beans.util.Beans;
 
 /**
  * 入出庫伝票・明細行サービスクラスです.
@@ -60,6 +62,7 @@ public class EadService extends AbstractService<EadSlipTrn> {
 		public static final String QUANTITY = "quantity";
 		public static final String SALES_LINE_ID = "salesLineId";
 		public static final String SUPPLIER_LINE_ID = "supplierLineId";
+		public static final String MADE_DATE = "madeDate";
 
 		private static final String RACK_CATEGORY = "rackCategory";
 		private static final String E_CATEGORY = "eCategory";
@@ -298,6 +301,45 @@ public class EadService extends AbstractService<EadSlipTrn> {
 	}
 
 	/**
+	 * 入出庫伝票製造年月日明細行を登録します.
+	 * @param eadMadeDateTrn 入出庫伝票製造年月日明細行エンティティ
+	 * @throws ServiceException
+	 */
+	public void insertMadeDate(List<EadMadeDateTrnDto> eadMadeDateTrnList) throws ServiceException {
+		for(EadMadeDateTrnDto dto : eadMadeDateTrnList){
+
+			// 商品コードに入力のない行は処理しない
+			if (!StringUtil.hasLength(dto.productCode)) {
+				continue;
+			}
+			EadMadeDateTrn eadMadeDateTrn = Beans.createAndCopy(EadMadeDateTrn.class,
+					dto)
+					.dateConverter(Constants.FORMAT.DATE, "madeDate", "validDate")
+					.execute();
+			
+			insertMadeDate(eadMadeDateTrn);
+		}
+	}	
+	
+	/**
+	 * 入出庫伝票製造年月日明細行を登録します.
+	 * @param eadMadeDateTrn 入出庫伝票製造年月日明細行エンティティ
+	 * @return 登録件数
+	 * @throws ServiceException
+	 */
+	public int insertMadeDate(EadMadeDateTrn eadMadeDateTrn) throws ServiceException {
+		try {
+			// SQLパラメータを構築する
+			Map<String, Object> param = createMadeDateSqlParam(eadMadeDateTrn);
+			return this.updateBySqlFile("ead/InsertMadeDate.sql", param).execute();
+		} catch (Exception e) {
+			ServiceException se = new ServiceException(e);
+			se.setStopOnError(true);
+			throw se;
+		}
+	}	
+
+	/**
 	 * 入出庫伝票を更新します.
 	 * @param eadSlipTrn 入出庫伝票エンティティ
 	 * @return 更新件数
@@ -407,6 +449,27 @@ public class EadService extends AbstractService<EadSlipTrn> {
 	}
 
 	/**
+	 * 入出庫伝票番号を指定して入出庫伝票製造年月日明細を削除します.
+	 * @param eadSlipId 入出庫伝票番号
+	 * @return 削除件数
+	 * @throws ServiceException
+	 */
+	public int deleteMadeDateByEadSlipId(Integer eadSlipId) throws ServiceException {
+		try {
+			// SQLパラメータを構築する
+			Map<String, Object> param = super.createSqlParam();
+			param.put(EadService.Param.EAD_SLIP_ID, eadSlipId);
+
+			return this.updateBySqlFile("ead/DeleteMadeDateByEadSlipId.sql", param)
+					.execute();
+		} catch (Exception e) {
+			ServiceException se = new ServiceException(e);
+			se.setStopOnError(true);
+			throw se;
+		}
+	}	
+	
+	/**
 	 * 伝票作成時のSQLパラメータを作成します.
 	 * @param eadSlipTrn 入出庫伝票エンティティ
 	 * @return 伝票作成時のSQLパラメータ
@@ -454,6 +517,20 @@ public class EadService extends AbstractService<EadSlipTrn> {
 		return param;
 	}
 
+	/**
+	 * 明細作成時のSQLパラメータを作成します.
+	 * @param eadLineTrn 入出庫伝票エンティティ
+	 * @return 明細作成時のSQLパラメータ
+	 */
+	protected Map<String, Object> createMadeDateSqlParam(EadMadeDateTrn eadMadeDateTrn) {
+		Map<String, Object> param = super.createSqlParam();
+		param.put(EadService.Param.EAD_SLIP_ID, eadMadeDateTrn.eadSlipId);
+		param.put(EadService.Param.PRODUCT_CODE, eadMadeDateTrn.productCode);
+		param.put(EadService.Param.RACK_CODE, eadMadeDateTrn.rackCode);
+		param.put(EadService.Param.MADE_DATE, eadMadeDateTrn.madeDate);
+		param.put(EadService.Param.QUANTITY, eadMadeDateTrn.quantity);
+		return param;
+	}	
 	/**
 	 * 商品コードを指定して、締処理されていない（当月分の）入庫数をカウントして取得します.
 	 *

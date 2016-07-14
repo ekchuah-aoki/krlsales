@@ -1723,10 +1723,12 @@ public class ProductService extends
 			}
 			
 			//AOKI出力方法(商品別、棚別）
+			param.put(Param.OUTTYPE_RACK, null);
 			if (conditions.containsKey(Param.OUTTYPE_RACK)) {
-				param.put(Param.OUTTYPE_RACK, conditions.get(Param.OUTTYPE_RACK));
-			}else{
-				param.put(Param.OUTTYPE_RACK, null);
+				String flg = (String)(conditions.get(Param.OUTTYPE_RACK));
+				if(flg.equals(Constants.FLAG.ON)){
+					param.put(Param.OUTTYPE_RACK, conditions.get(Param.OUTTYPE_RACK));
+				}
 			}
 
 			this.setConditionAggregate(conditions, sortColumn, sortOrderAsc,
@@ -1752,7 +1754,6 @@ public class ProductService extends
 							param).execute();
 					cal.add(Calendar.MONTH, -1);
 				}
-
 				// 年月度と商品コードの直積表を作成
 				this.updateBySqlFile("product/InsertStdDevAggregateYmWork.sql",
 						param).execute();

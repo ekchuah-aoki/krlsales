@@ -12,6 +12,10 @@ import java.util.StringTokenizer;
 
 import javax.annotation.Resource;
 
+import org.seasar.framework.beans.Converter;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.struts.util.MessageResourcesUtil;
+
 import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.CheckUtil;
 import jp.co.arkinfosys.common.Constants;
@@ -20,6 +24,7 @@ import jp.co.arkinfosys.dto.YmDto;
 import jp.co.arkinfosys.dto.purchase.PurchaseLineDto;
 import jp.co.arkinfosys.dto.purchase.PurchaseSlipDto;
 import jp.co.arkinfosys.dto.stock.EadLineTrnDto;
+import jp.co.arkinfosys.dto.stock.EadMadeDateTrnDto;
 import jp.co.arkinfosys.dto.stock.EadSlipTrnDto;
 import jp.co.arkinfosys.entity.EadLineTrn;
 import jp.co.arkinfosys.entity.EadSlipTrn;
@@ -34,10 +39,6 @@ import jp.co.arkinfosys.service.RackService;
 import jp.co.arkinfosys.service.SeqMakerService;
 import jp.co.arkinfosys.service.YmService;
 import jp.co.arkinfosys.service.exception.ServiceException;
-
-import org.seasar.framework.beans.Converter;
-import org.seasar.framework.beans.util.Beans;
-import org.seasar.struts.util.MessageResourcesUtil;
 
 /**
  * 仕入伝票入出庫入力サービスクラスです.
@@ -116,6 +117,10 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 
 			// 入出庫伝票の削除
 			this.eadService.deleteSlipByEadSlipId(eadSlipTrn.eadSlipId);
+			
+			//入出庫製造年月日明細の削除
+			this.eadService.deleteMadeDateByEadSlipId(eadSlipTrn.eadSlipId);
+			
 		} catch (Exception e) {
 			ServiceException se = new ServiceException(e);
 			se.setStopOnError(true);
@@ -183,6 +188,10 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 			}
 
 			// 入出庫明細の更新処理(既に存在する入出庫明細は更新し、存在しない入出庫明細は新規作成する)
+
+			List<EadMadeDateTrnDto> eadMadeDateTrnDtoList = new ArrayList<EadMadeDateTrnDto>();
+			this.eadService.deleteMadeDateByEadSlipId(eadSlipTrn.eadSlipId);
+			
 			short lineNo = 1;
 			Map<String, PurchaseLineDto> supplierLineTrnUpdateTargetMap = new HashMap<String, PurchaseLineDto>();
 			List<PurchaseLineDto> l = sstd.getLineDtoList();
@@ -207,6 +216,8 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 			    	continue;
 			    }
 
+			    //TODO:セット商品未対応
+			    
 				// 更新対象の明細を格納する(後で更新されなかった入出庫明細を全削除するためのマーク)
 				supplierLineTrnUpdateTargetMap.put(supplierLineTrnDto.supplierLineId, supplierLineTrnDto);
 
@@ -223,8 +234,16 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 					EadLineTrn eadLineTrn = Beans.createAndCopy(EadLineTrn.class, eadLineTrnDto).execute();
 					this.eadService.insertLine(eadLineTrn);
 				}
+				
+				//製造年月日明細を作成
+				EadLineTrnDto eadLineTrnDto = setToDto( eadSlipTrn.eadSlipId.toString(), sstd, supplierLineTrnDto , 0);
+				eadMadeDateTrnDtoList = setToMadeDateDto(eadMadeDateTrnDtoList, supplierLineTrnDto, eadLineTrnDto);
+				
 			}
 
+			//製造年月日明細を更新
+			this.eadService.insertMadeDate(eadMadeDateTrnDtoList);
+			
 			// 更新処理の対象とならなかった入出庫明細は全て削除する
 			for( EadLineTrn eadLineTrn : eadLineTrnList) {
 				if( ! supplierLineTrnUpdateTargetMap.containsKey(eadLineTrn.supplierLineId.toString())) {
@@ -236,6 +255,10 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 			if(supplierLineTrnUpdateTargetMap.size() == 0) {
 				// 全ての仕入明細がマイナス数量の場合は、入出庫伝票も削除する
 				this.eadService.deleteSlipByEadSlipId(eadSlipTrn.eadSlipId);
+				
+				//入出庫製造年月日明細の削除
+				this.eadService.deleteMadeDateByEadSlipId(eadSlipTrn.eadSlipId);
+
 			} else {
 				// プラス数量の仕入明細があれば、入出庫伝票の更新を行う(伝票自体には変更ないが、明細は変更されたので伝票を更新した形跡のみ残しておく)
 				EadSlipTrnDto updatedEadSlipTrnDto = Beans.createAndCopy(EadSlipTrnDto.class, eadSlipTrn ).execute();
@@ -309,6 +332,8 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 		try {
 			EadSlipTrnDto eadSlipTrnDto = new EadSlipTrnDto();
 			eadSlipTrnDto.setLineDtoList(new ArrayList<EadLineTrnDto>());
+			
+			List<EadMadeDateTrnDto> eadMadeDateTrnDtoList = new ArrayList<EadMadeDateTrnDto>();
 
 			// 入出庫伝票の処理
 			// 入出庫伝票番号を採番
@@ -345,7 +370,10 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 
 						// 明細情報を設定
 						EadLineTrnDto eadLineTrnDto = setToDto( eadSlipTrnDto.eadSlipId, sstd, sltd , pj, psj, ++lineNo);
-
+						
+						// 製造年月日明細を設定
+						eadMadeDateTrnDtoList = setToMadeDateDto(eadMadeDateTrnDtoList, sltd, eadLineTrnDto);
+						
 						// 明細行を追加
 						eadSlipTrnDto.getLineDtoList().add(eadLineTrnDto);
 					}
@@ -358,6 +386,10 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 					// 明細情報を設定
 					EadLineTrnDto eadLineTrnDto = setToDto( eadSlipTrnDto.eadSlipId, sstd, sltd , ++lineNo);
 
+					// 製造年月日明細を設定
+					eadMadeDateTrnDtoList = setToMadeDateDto(eadMadeDateTrnDtoList, sltd, eadLineTrnDto);
+
+					
 					// 明細行を追加
 					eadSlipTrnDto.getLineDtoList().add(eadLineTrnDto);
 				}
@@ -366,7 +398,9 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 			if( lineNo > 0 ){
 				// Insert
 				eadService.insertSlipAndLine(eadSlipTrnDto);
-
+				
+				eadService.insertMadeDate(eadMadeDateTrnDtoList);
+				
 				return eadSlipTrnDto.eadSlipId;
 			}
 			// 登録しなかった
@@ -442,7 +476,7 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 	}
 
 	/**
-	 * 入出庫伝票明細行DTO情報を設定します.
+	 * 入出庫伝票明細行DTO情報を設定します.(セット商品）
 	 * @param eadSlipId 追加対象入出庫伝票番号
 	 * @param sstd 登録元仕入れ伝票DTO
 	 * @param sltd 登録元仕入れ伝票明細行DTO
@@ -501,4 +535,51 @@ public class InputStockPurchaseService extends AbstractService<EadSlipTrn> {
 
 		return eadLineTrnDto;
 	}
+	
+	/**
+	 * 入出庫伝票製造年月日明細行DTO情報を設定します.
+	 * @param edaMadeDateList 入出庫伝票製造年月日明細
+	 * @param sltd 登録元仕入れ伝票明細行DTO
+	 * @param edaLine 入出庫伝票明細行DTO情報
+	 * @return 入出庫伝票製造年月日明細
+	 * @throws ServiceException
+	 */
+	protected List<EadMadeDateTrnDto> setToMadeDateDto(List<EadMadeDateTrnDto> edaMadeDateList, PurchaseLineDto sltd, EadLineTrnDto edaLine
+			) throws ServiceException {
+		
+		
+		//同一商品、棚、製造年月日の明細が存在するかチェック
+		EadMadeDateTrnDto eadMadeDateTrnDto = null;
+
+		for(EadMadeDateTrnDto dto: edaMadeDateList){
+			if( dto.productCode.equals(edaLine.productCode)
+					&& dto.rackCode.equals(edaLine.rackCode)
+					&& dto.madeDate.equals(sltd.madeDate)){
+				eadMadeDateTrnDto = dto;
+				break;
+				
+			}
+		}
+		
+		//新規の場合
+		if( eadMadeDateTrnDto == null ){
+			eadMadeDateTrnDto = new EadMadeDateTrnDto();
+			eadMadeDateTrnDto.eadSlipId = edaLine.eadSlipId;
+			eadMadeDateTrnDto.productCode = edaLine.productCode;
+			eadMadeDateTrnDto.rackCode = edaLine.rackCode;
+			eadMadeDateTrnDto.madeDate = sltd.madeDate;
+			eadMadeDateTrnDto.quantity = "0";
+			
+			edaMadeDateList.add(eadMadeDateTrnDto);
+		}
+
+		// 数量
+		Converter conv = createProductNumConverter();
+		BigDecimal num = new BigDecimal( ((Number)conv.getAsObject(eadMadeDateTrnDto.quantity)).toString() );
+		num = num.add(new BigDecimal( ((Number)conv.getAsObject(edaLine.quantity)).toString()));
+		eadMadeDateTrnDto.quantity = num.toString();
+
+		return edaMadeDateList;
+	}	
+	
 }

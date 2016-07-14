@@ -16,10 +16,15 @@ import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
+import org.seasar.framework.beans.util.BeanMap;
+import org.seasar.framework.beans.util.Beans;
+import org.seasar.struts.util.MessageResourcesUtil;
+
 import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.StockInfoDto;
 import jp.co.arkinfosys.dto.YmDto;
+import jp.co.arkinfosys.entity.ProductMadeDateStockTrn;
 import jp.co.arkinfosys.entity.ProductStockTrn;
 import jp.co.arkinfosys.entity.join.EntrustPorderRestDetail;
 import jp.co.arkinfosys.entity.join.EntrustStockDetail;
@@ -31,10 +36,6 @@ import jp.co.arkinfosys.entity.join.RackJoin;
 import jp.co.arkinfosys.entity.join.RorderRestDetail;
 import jp.co.arkinfosys.entity.join.StockQuantity;
 import jp.co.arkinfosys.service.exception.ServiceException;
-import jp.co.arkinfosys.service.RackService;
-import org.seasar.framework.beans.util.Beans;
-import org.seasar.struts.util.MessageResourcesUtil;
-import org.seasar.framework.beans.util.BeanMap;
 
 
 /**
@@ -733,6 +734,28 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 		try {
 			return this.selectBySqlFile(ProductStockTrn.class,
 					"productstock/FindLastProductStockTrn.sql", super.createSqlParam()).getResultList();
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+	/**
+	 * 在庫締情報が存在する商品の製造年月日在庫情報のリストを返します.
+	 * @param 在庫締情報
+	 * @return 在庫情報{@link ProductMadeDateStockTrn}のリスト
+	 * @throws ServiceException
+	 */
+	public List<ProductMadeDateStockTrn> findProductMadeDateStockTrn(ProductStockTrn pst)
+			throws ServiceException {
+		try {
+			
+			Map<String, Object> param = super.createSqlParam();
+			param.put(Param.PRODUCT_CODE, pst.productCode);
+			param.put(Param.RACK_CODE, pst.rackCode);
+			param.put(Param.STOCK_ANNUAL, pst.stockAnnual);
+			param.put(Param.STOCK_MONTHLY, pst.stockMonthly);
+			
+			return this.selectBySqlFile(ProductMadeDateStockTrn.class,
+					"productstock/FindProductMadeDateStockTrn.sql", param).getResultList();
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

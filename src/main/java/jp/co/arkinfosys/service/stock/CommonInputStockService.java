@@ -149,6 +149,9 @@ public abstract class CommonInputStockService extends
 
 		eadService.deleteSlipByEadSlipId(Integer.valueOf(id));
 
+		//入出庫製造年月日明細の削除
+		this.eadService.deleteMadeDateByEadSlipId(Integer.valueOf(id));
+
 		return lockResult;
 	}
 

@@ -2,9 +2,7 @@ INSERT INTO STDDEV_PRODUCT_SALES_YM_WORK_/*$domainId*/ (
 	SESSION_ID,
 	YM,
 	PRODUCT_CODE,
-	/*IF outtypeRack != null*/
 	RACK_CODE,
-	/*END*/
 	QUANTITY
 )
 (
@@ -14,6 +12,9 @@ INSERT INTO STDDEV_PRODUCT_SALES_YM_WORK_/*$domainId*/ (
 			SL.PRODUCT_CODE,
 			/*IF outtypeRack != null*/
 			SL.RACK_CODE_SRC AS RACK_CODE,
+			/*END*/
+			/*IF outtypeRack == null*/
+			'DUMMY' AS RACK_CODE,
 			/*END*/
 			
 			SUM(SL.QUANTITY)

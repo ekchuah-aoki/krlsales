@@ -2,9 +2,7 @@ INSERT INTO STDDEV_AGGREGATE_YM_WORK_/*$domainId*/ (
 	SESSION_ID,
 	YM,
 	PRODUCT_CODE,
-	/*IF outtypeRack != null*/
 	RACK_CODE,
-	/*END*/
 	QUANTITY
 )
 (
@@ -14,6 +12,9 @@ INSERT INTO STDDEV_AGGREGATE_YM_WORK_/*$domainId*/ (
 		A.PRODUCT_CODE,
 		/*IF outtypeRack != null*/
 		A.RACK_CODE,
+		/*END*/
+		/*IF outtypeRack == null*/
+		'DUMMY' AS RACK_CODE,
 		/*END*/
 		0
 	FROM

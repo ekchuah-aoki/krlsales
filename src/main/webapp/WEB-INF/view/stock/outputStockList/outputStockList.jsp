@@ -46,6 +46,13 @@
 			data["excludeSalesCancel"] = $("#excludeSalesCancel").attr("checked");
 			data["excludeNotManagementStock"] = $("#excludeNotManagementStock").attr("checked");
 			data["excludeMultiRack"] = $("#excludeMultiRack").attr("checked");
+
+			if($("#radioOutType_0").attr("checked")){
+				data["radioOutType"] = "${RADIO_OUTTYPE_VALUE_0}";
+			}else{
+				data["radioOutType"] = "${RADIO_OUTTYPE_VALUE_1}";
+			}
+			
 			return data;
 		}
 
@@ -145,8 +152,8 @@
 						<tr>
 							<th><div class="col_title_right"><bean:message key='labels.outputTypeProductsStok'/></div></th><%// 出力方法 %>
 							<td>
-								<html:radio property="radioOutType" styleId="radioOutType_${RADIO_OUTTYPE_VALUE_0}" value="${RADIO_OUTTYPE_VALUE_0}" tabindex="210" /><label for="radioOutType_${RADIO_OUTTYPE_VALUE_0}"><bean:message key='labels.outputtype.product'/></label><br><%// 商品別 %>
-								<html:radio property="radioOutType" styleId="radioOutType_${RADIO_OUTTYPE_VALUE_1}" value="${RADIO_OUTTYPE_VALUE_1}" tabindex="211" /><label for="radioOutType_${RADIO_OUTTYPE_VALUE_1}"><bean:message key='labels.outputtype.rack'/></label><br><%// 棚別 %>
+								<html:radio property="radioOutType" styleId="radioOutType_0" value="${RADIO_OUTTYPE_VALUE_0}" tabindex="210" /><label for="radioOutType_${RADIO_OUTTYPE_VALUE_0}"><bean:message key='labels.outputtype.product'/></label><br><%// 商品別 %>
+								<html:radio property="radioOutType" styleId="radioOutType_1" value="${RADIO_OUTTYPE_VALUE_1}" tabindex="211" /><label for="radioOutType_${RADIO_OUTTYPE_VALUE_1}"><bean:message key='labels.outputtype.rack'/></label><br><%// 棚別 %>
 							</td>
 						</tr>
 					</table>
