@@ -138,17 +138,17 @@ public class ShowStockInfoDialogAction extends AbstractDialogAction {
 				
 				//該当する棚番号の在庫情報を返す
 				//倉庫別在庫がない場合は、今まで通り
-				if( stokList.size()==0){
-					stockInfoDto = this.productStockService
-							.calcStockQuantityByProductCode(showStockInfoDialogForm.productCode);
-				}else{
-					for(StockInfoDto stok : stokList){
-						if( stok.rackCode.equals(showStockInfoDialogForm.rackCode)){
-							stockInfoDto = stok;
-							break;
-						}
+				for(StockInfoDto stok : stokList){
+					if( stok.rackCode.equals(showStockInfoDialogForm.rackCode)){
+						stockInfoDto = stok;
+						break;
 					}
 				}
+				if( stockInfoDto==null){
+					stockInfoDto = this.productStockService
+							.calcStockQuantityByProductCode(showStockInfoDialogForm.productCode);
+				}
+				
 			}
 			
 			LinkedHashMap<String, String> map = new LinkedHashMap<String, String>();

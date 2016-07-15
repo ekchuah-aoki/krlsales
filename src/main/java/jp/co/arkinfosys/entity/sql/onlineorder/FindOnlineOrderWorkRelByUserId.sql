@@ -28,7 +28,6 @@ ORDER BY
 	/*$sortOrder*/
 	/*END*/
 	/*IF sortColumn == 'LOAD_DATE' */
-	,LINE_NO ASC,SUPPLIER_DATE ASC	-- 昔のデータは値が入っていないので、入っている項目を指定して順序を確定させる
 	/*END*/
 /*END*/
 /*IF limitRow != null && offsetRow != null */

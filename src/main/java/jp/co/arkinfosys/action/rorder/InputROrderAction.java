@@ -1106,8 +1106,12 @@ public class InputROrderAction extends
 				}
 			}
 
-			lineDto.possibleDrawQuantity = String
-					.valueOf(stockInfo.possibleDrawQuantity);
+			if(stockInfo==null){
+				lineDto.possibleDrawQuantity = "0";
+			}else{
+				lineDto.possibleDrawQuantity = String
+						.valueOf(stockInfo.possibleDrawQuantity);
+			}
 			// 完納状態を設定
 			if (Constants.STATUS_RORDER_LINE.RECEIVED.equals(lineDto.status)) {
 				lineDto.statusName = this.inputROrderForm.defaultStatusName;
