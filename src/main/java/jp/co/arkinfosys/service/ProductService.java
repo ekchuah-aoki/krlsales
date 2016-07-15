@@ -961,10 +961,12 @@ public class ProductService extends
 			*/
 		
 		// ソートオーダーを設定する
-		if (sortOrderAsc) {
-			param.put(ProductService.Param.SORT_ORDER, Constants.SQL.ASC);
-		} else {
-			param.put(ProductService.Param.SORT_ORDER, Constants.SQL.DESC);
+		if (sortColumnList.size()>=1) {
+			if (sortOrderAsc) {
+				param.put(ProductService.Param.SORT_ORDER, Constants.SQL.ASC);
+			} else {
+				param.put(ProductService.Param.SORT_ORDER, Constants.SQL.DESC);
+			}
 		}
 	}
 	

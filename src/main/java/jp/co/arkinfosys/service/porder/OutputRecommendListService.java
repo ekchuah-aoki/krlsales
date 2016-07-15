@@ -31,6 +31,7 @@ import jp.co.arkinfosys.service.YmService;
 import jp.co.arkinfosys.service.exception.ServiceException;
 
 import org.seasar.framework.beans.util.Beans;
+import org.seasar.framework.util.StringUtil;
 /**
  * 補充発注推奨リスト出力サービスクラスです.
  * @author Ark Information Systems
@@ -303,7 +304,9 @@ public class OutputRecommendListService extends AbstractService<PoSlipTrn> {
 
 			//検索する
 			ArrayList<String> sortColumnList = new ArrayList<String>();
-			sortColumnList.add(sortColumn);
+			if(!StringUtil.isEmpty(sortColumn)){
+				sortColumnList.add(sortColumn);
+			}
 			List<ProductStockInfoDto> stockInfoList = productService.aggregateProductStockInfoByCondition(map,sortColumnList, sortOrderAsc);
 
 			for(ProductStockInfoDto productStockInfoDto: stockInfoList){

@@ -360,6 +360,7 @@ public class InputStockAction extends
 
 				// 値チェック（相関）
 				// 同商品、同棚番はエラー
+				/*
 				if (StringUtil.hasLength(eadLineTrnDto.productCode)
 						&& StringUtil.hasLength(eadLineTrnDto.rackCode)) {
 					for (EadLineTrnDto eadLineTrnDto2 : inputStockForm.eadLineTrnDtoList) {
@@ -379,6 +380,7 @@ public class InputStockAction extends
 						}
 					}
 				}
+				*/
 			}
 		}
 
