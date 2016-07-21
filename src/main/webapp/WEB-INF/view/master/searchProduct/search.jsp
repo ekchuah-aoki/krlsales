@@ -383,8 +383,10 @@
 						onclick="addProduct();" <c:if test="${!isUpdate}">disabled="disabled"</c:if> >F3<br>追加</button>
 					<button type="button" tabindex="2003"
 						onclick="outputExcel();" <c:if test="${!userDto.validUpDwnProducts}">disabled="disabled"</c:if> >F4<br><bean:message key='words.name.excel'/>出力</button>
-					<button type="button" tabindex="2004"
+					<button type="button" tabindex="2004" disabled="disabled">F5<br>&nbsp;</button>
+					<%-- <button type="button" tabindex="2004"
 						onclick="showImportExcelDialog();" <c:if test="${!userDto.validUpDwnProducts}">disabled="disabled"</c:if> >F5<br><bean:message key='words.name.excel'/>取込</button>
+					--%>
 					<button type="button" disabled="disabled">F6<br>&nbsp;</button>
 					<button type="button" disabled="disabled">F7<br>&nbsp;</button>
 					<button type="button" disabled="disabled">F8<br>&nbsp;</button>
