@@ -28,6 +28,12 @@ public class Customer extends AuditInfo implements Serializable {
 
 	public String customerKana;
 
+	/** 顧客種別 */
+	public String customerKind;
+	
+	/** 顧客敬称 */
+	public String customerPreCategory;
+
 	public String customerOfficeName;
 
 	public String customerOfficeKana;

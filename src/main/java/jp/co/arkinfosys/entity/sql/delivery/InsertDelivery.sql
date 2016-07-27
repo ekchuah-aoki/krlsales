@@ -23,6 +23,8 @@ DELIVERY_CODE
 ,UPD_FUNC
 ,UPD_DATETM
 ,UPD_USER
+,DELIVERY_KIND
+,DELIVERY_PRE_CATEGORY
 )
 VALUES
 (
@@ -49,4 +51,6 @@ VALUES
 ,/*updFunc*/
 ,now()
 ,/*updUser*/
+,/*deliveryKind*/
+,/*deliveryPreCategory*/
 )

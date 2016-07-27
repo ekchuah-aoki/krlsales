@@ -50,6 +50,8 @@ CUSTOMER_CODE
 ,UPD_DATETM
 ,UPD_USER
 ,LAST_SALES_CUTOFF_DATE
+,CUSTOMER_KIND
+,CUSTOMER_PRE_CATEGORY
 )
 VALUES
 (
@@ -103,4 +105,6 @@ VALUES
 ,now()
 ,/*updUser*/
 ,/*lastSalesCutoffDate*/
+,/*customerKind*/
+,/*customerPreCategory*/
 )

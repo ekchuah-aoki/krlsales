@@ -570,7 +570,7 @@
             return;
         }
 
-        openSearchProductStokDialog('product', "0", callbackOpenSearchProductDialog);
+        openSearchProductStokDialog('product', "1", callbackOpenSearchProductDialog);
         setInit("product", "productRow_" + lineNo + "_code");
 
     }

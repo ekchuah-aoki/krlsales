@@ -3,6 +3,7 @@
  */
 package jp.co.arkinfosys.action.ajax.dialog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -159,12 +160,24 @@ public class SearchProductStokDialogAction extends
 			zeroZaiko = true;
 		}
 		
+		List<ProductDto> newProList = new ArrayList<ProductDto>();
+		
 		for(ProductDto pro : proList){
 			if( CategoryTrns.PRODUCT_STOCK_CTL_YES.equals(pro.stockCtlCategory)){ // 在庫管理区分
 					pro.stokInfoList = this.productStockService
 							.calcStockRackQuantityByProductCode(pro.productCode,zeroZaiko);
+					
+					//0在庫は対象外にする場合、在庫＞０の商品のみでリスト再構築
+					if(zeroZaiko){
+						newProList.add(pro);
+					}else if(pro.stokInfoList!=null){
+						newProList.add(pro);
+					}
+					
 			}
 		}
+		
+		this.searchProductStokDialogForm.searchResultList = newProList;
 		
 		
 	}

@@ -55,6 +55,14 @@ public class EditCustomerForm extends AbstractEditForm {
 	@Maxlength(maxlength = 14)
 	public String customerAbbr;
 
+	/** 顧客種別 */
+	@Required
+	public String customerKind;
+	
+	/** 顧客敬称 */
+	@Required
+	public String customerPreCategory;
+
 	/** 部署名 */
 	@Maxlength(maxlength = 60)
 	public String customerDeptName;
@@ -212,7 +220,7 @@ public class EditCustomerForm extends AbstractEditForm {
 
 	public String newDeliveryPcKana;
 
-	/** 新規追加欄の「敬称」 */
+	/** 新規追加欄の「担当敬称」 */
 	public String newDeliveryPcPreCategory;
 
 	public String newDeliveryTel;
@@ -222,8 +230,18 @@ public class EditCustomerForm extends AbstractEditForm {
 	public String newDeliveryEmail;
 
 	public String lastSalesCutoffDate;
+	
+	/** 新規追加欄の「敬称」 */
+	public String newDeliveryPreCategory;
+
+	/** 新規追加欄の「種類」 */
+	public String newDeliveryKind;
+	
 
 	// リスト
+	/** 顧客種別 */
+	public List<LabelValueBean> customerKindList = new ArrayList<LabelValueBean>();
+
 	/** 敬称 */
 	public List<LabelValueBean> preTypeCategoryList = new ArrayList<LabelValueBean>();
 
@@ -275,6 +293,8 @@ public class EditCustomerForm extends AbstractEditForm {
 		customerOfficeKana = "";
 		customerAbbr = "";
 		customerDeptName = "";
+		customerKind = "";
+		customerPreCategory = "";
 		customerZipCode = "";
 		customerAddress1 = "";
 		customerAddress2 = "";
@@ -323,6 +343,8 @@ public class EditCustomerForm extends AbstractEditForm {
 		newDeliveryPcPreCategory = "";
 		newDeliveryTel = "";
 		newDeliveryFax = "";
+		newDeliveryPreCategory = "";
+		newDeliveryKind = "";
 		deliveryList = new ArrayList<DeliveryAndPre>();
 		billTo = new DeliveryAndPre();
 		preTypeCategoryList.clear();
@@ -336,6 +358,7 @@ public class EditCustomerForm extends AbstractEditForm {
 		paybackTypeCategoryList.clear();
 		taxFractCategoryList.clear();
 		priceFractCategoryList.clear();
+		customerKindList.clear();
 		originalDeliveryList = null;
 		lastSalesCutoffDate = "";
 	}
@@ -408,6 +431,14 @@ public class EditCustomerForm extends AbstractEditForm {
 				.getMessage("labels.billEmail");
 		String labelBillFax = MessageResourcesUtil.getMessage("labels.billFax");
 
+		String labelCustomerKind = MessageResourcesUtil.getMessage("labels.customerKind");
+		String labelCustomerPreCategory = MessageResourcesUtil.getMessage("labels.customerPreCategory");
+		String labelDeliveryKind = MessageResourcesUtil.getMessage("labels.deliveryKind");
+		String labelDeliveryPreCategory = MessageResourcesUtil.getMessage("labels.deliveryPreCategory");
+		String labelBillKind = MessageResourcesUtil.getMessage("labels.billKind");
+		String labelBillPreCategory = MessageResourcesUtil.getMessage("labels.billPreCategory");
+		
+		
 		ActionMessages errors = new ActionMessages();
 
 		// 納入先必須チェック
@@ -431,6 +462,15 @@ public class EditCustomerForm extends AbstractEditForm {
 				// 納入先名カナ
 				checkRequired(index, delivery.deliveryKana, labelDeliveryKana,
 						errors);
+
+				// 納入先種別
+				checkRequired(index, delivery.deliveryKind, labelCustomerKind,
+						errors);
+
+				// 納入先敬称
+				checkRequired(index, delivery.deliveryPreCategory, labelDeliveryPreCategory,
+						errors);
+				
 				// 郵便番号
 				checkRequired(index, delivery.deliveryZipCode,
 						labelDeliveryZipCode, errors);
@@ -459,6 +499,11 @@ public class EditCustomerForm extends AbstractEditForm {
 		checkRequired(billTo.deliveryName, labelBillName, errors);
 		// 請求先名カナ
 		checkRequired(billTo.deliveryKana, labelBillKana, errors);
+		// 請求先種類
+		checkRequired(billTo.deliveryKind, labelBillKind, errors);
+		// 請求先敬称
+		checkRequired(billTo.deliveryPreCategory, labelBillPreCategory, errors);
+		
 		// 郵便番号
 		checkRequired(billTo.deliveryZipCode, labelBillZipCode, errors);
 		// 住所１

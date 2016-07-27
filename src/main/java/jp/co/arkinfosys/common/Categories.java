@@ -379,5 +379,11 @@ public final class Categories {
 	 * 区分名：請求書日付有無
 	 */
 	public static final int BILL_DATE_PRINT = 76;
+	
+	/**
+	 * 区分名：顧客種別
+	 */
+	public static final int CUSTOMER_KIND = 900;
+	
 
 }

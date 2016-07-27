@@ -1,4 +1,5 @@
 INSERT INTO EAD_MADEDATE_TRN_/*$domainId*/ (
+	EAD_MADEDATE_ID,
 	EAD_SLIP_ID,
 	PRODUCT_CODE,
 	RACK_CODE,
@@ -8,6 +9,7 @@ INSERT INTO EAD_MADEDATE_TRN_/*$domainId*/ (
 	CRE_DATETM,
 	CRE_USER
 ) VALUES (
+	/*eadMadedateId*/,
 	/*eadSlipId*/,
 	/*productCode*/,
 	/*rackCode*/,

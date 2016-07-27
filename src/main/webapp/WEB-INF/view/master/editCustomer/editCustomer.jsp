@@ -188,6 +188,8 @@
         $("#deliveryRow_0Tel").val("");
         $("#deliveryRow_0Fax").val("");
         $("#deliveryRow_0Email").val("");
+        $("#deliveryRow_0Kind").val("");
+        $("#deliveryRow_0PreCategory").val("");
     }
 
     function showDelivery(index, notClear) {
@@ -202,7 +204,7 @@
             $("#delb").removeAttr("disabled");
         }
         var tabindex = 604;
-        for (var j = 1; j <= 6; j++) {
+        for (var j = 1; j <= 7; j++) {
             var trObj = $("#deliveryRow_" + index + "_" + j);
             trObj.show();
             trObj.find("input, select").each(
@@ -214,7 +216,7 @@
     }
 
     function removeDelivery(index) {
-        for (var j = 1; j <= 6; j++) {
+        for (var j = 1; j <= 7; j++) {
             var trObj = $("#deliveryRow_" + index + "_" + j);
             trObj.remove();
         }
@@ -277,7 +279,7 @@
 
     function hideAllDelivery() {
         for (var i=0; i <= maxCount;i++) {
-            for (var j = 1; j <= 6; j++) {
+            for (var j = 1; j <= 7; j++) {
                 var trObj = $("#deliveryRow_" + i + "_" + j);
                 trObj.hide();
                 trObj.find("input, select").each(
@@ -296,6 +298,13 @@
         // 顧客名カナ
         $("#" + idPrefix + "Kana").val($("#customerKana").val());
 
+        // 顧客種別
+        $("#" + idPrefix + "Kind").val($("#customerKind").val());
+
+        // 顧客敬称
+        $("#" + idPrefix + "PreCategory").val($("#customerPreCategory").val());
+        
+        
         // 事業所名
         $("#" + idPrefix + "OfficeName").val($("#customerOfficeName").val());
 
@@ -403,6 +412,44 @@
         targetRow.after(trObj);
 
         var prevTrObj = trObj;
+        
+        
+        // 次の行へ(種別、敬称)
+        trObj = $("#deliveryRow_0_7").clone(true);
+        tdObj = trObj.children(":first");
+        // 行ID
+        trObj.attr("id", "deliveryRow_" + maxCount + "_7");
+
+        // 納入先種別
+        tdObj = tdObj.next();       // thタグを読み飛ばす
+        elem = tdObj.children(":first");
+        elem.attr("name", "deliveryList[" + (maxCount-1) + "].deliveryKind");
+        elem.attr("id", "deliveryRow_" + maxCount + "Kind");
+        elem.val($("#deliveryRow_0Kind").val());
+
+        
+        
+        // 次のセルへ
+        tdObj = tdObj.next();
+
+        // 納入先敬称
+        tdObj = tdObj.next();       // thタグを読み飛ばす
+        // テキストボックス
+        elem = tdObj.children(":first");
+        elem.attr("name", "deliveryList[" + (maxCount-1) + "].deliveryPreCategory");
+        elem.attr("id", "deliveryRow_" + maxCount + "PreCategory");
+        elem.val($("#deliveryRow_0PreCategory").val());
+        
+        // 次のセルへ
+        tdObj = tdObj.next();
+
+        // 行追加
+        prevTrObj.after(trObj);
+        prevTrObj = trObj;
+        
+        
+        
+        
 
         // 次の行へ
         trObj = $("#deliveryRow_0_2").clone(true);
@@ -440,6 +487,8 @@
         // 行追加
         prevTrObj.after(trObj);
         prevTrObj = trObj;
+        
+        
 
         // 次の行へ
         trObj = $("#deliveryRow_0_3").clone();
@@ -518,6 +567,7 @@
         elem = tdObj.children(":first");
         elem.attr("name", "deliveryList[" + (maxCount-1) + "].deliveryPcPreCategory");
         elem.attr("id", "deliveryRow_" + maxCount + "PcPreCategory");
+        elem.val($("#deliveryRow_0PcPreCategory").val());
         elem = elem.next(); // hiddenは削除
         elem.remove();
 
@@ -985,14 +1035,33 @@
 							onfocus="this.curVal=this.value;"
 							onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); convertPaymentName(this.value); }"/></td>
 				</tr>
+
+				<tr>
+					<th><div class="col_title_right_req">顧客種別<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="customerKind" property="customerKind" tabindex="104">
+	                        <html:options collection="customerKindList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<th><div class="col_title_right_req">顧客敬称<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="customerPreCategory" property="customerPreCategory" tabindex="105">
+	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+				</tr>
 				<tr>
 					<th><div class="col_title_right">事業所名</div></th>
-					<td><html:text maxlength="60" styleId="customerOfficeName" property="customerOfficeName" style="width:250px" tabindex="104"/></td>
+					<td><html:text maxlength="60" styleId="customerOfficeName" property="customerOfficeName" style="width:250px" tabindex="106"/></td>
 					<th><div class="col_title_right">事業所名カナ</div></th>
-					<td><html:text maxlength="60" styleId="customerOfficeKana" property="customerOfficeKana" style="width:250px" tabindex="105"
+					<td><html:text maxlength="60" styleId="customerOfficeKana" property="customerOfficeKana" style="width:250px" tabindex="107"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/></td>
 					<th><div class="col_title_right">顧客略称</div></th>
-					<td><html:text maxlength="14" styleId="customerAbbr" property="customerAbbr" style="width:250px" tabindex="106"/></td>
+					<td><html:text maxlength="14" styleId="customerAbbr" property="customerAbbr" style="width:250px" tabindex="108"/></td>
 				</tr>
 			</table>
 
@@ -1194,51 +1263,71 @@
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 					</td>
 				</tr>
+				
+				<tr id="deliveryRow_0_7">
+					<th><div class="col_title_right_req">顧客種別<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="deliveryRow_0Kind" property="newDeliveryKind" tabindex="606">
+	                        <html:options collection="customerKindList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<th><div class="col_title_right_req">顧客敬称<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="deliveryRow_0PreCategory" property="newDeliveryPreCategory" tabindex="607">
+	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+				</tr>
+				
 				<tr id="deliveryRow_0_2">
 					<th><div class="col_title_right">事業所名</div></th>
 					<td>
-						<html:text maxlength="60" styleId="deliveryRow_0OfficeName" property="newDeliveryOfficeName" tabindex="606" style="width:200px;"/>
+						<html:text maxlength="60" styleId="deliveryRow_0OfficeName" property="newDeliveryOfficeName" tabindex="608" style="width:200px;"/>
 	                </td>
 					<th><div class="col_title_right">事業所名カナ</div></th>
 					<td>
-						<html:text maxlength="60" styleId="deliveryRow_0OfficeKana" property="newDeliveryOfficeKana" tabindex="607" style="width:200px;"
+						<html:text maxlength="60" styleId="deliveryRow_0OfficeKana" property="newDeliveryOfficeKana" tabindex="609" style="width:200px;"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 	                </td>
 					<th><div class="col_title_right">部署名</div></th>
 					<td>
-						<html:text maxlength="60" styleId="deliveryRow_0DeptName" property="newDeliveryDeptName" tabindex="608" style="width:200px;"/>
+						<html:text maxlength="60" styleId="deliveryRow_0DeptName" property="newDeliveryDeptName" tabindex="610" style="width:200px;"/>
 	                </td>
 				</tr>
 				<tr id="deliveryRow_0_3">
 					<th><div class="col_title_right_req">郵便番号<bean:message key='labels.must'/></div></th>
 					<td>
-						<html:text maxlength="8" styleId="deliveryRow_0ZipCode" property="newDeliveryZipCode" tabindex="609" style="width:100px;ime-mode:disabled;"
+						<html:text maxlength="8" styleId="deliveryRow_0ZipCode" property="newDeliveryZipCode" tabindex="611" style="width:100px;ime-mode:disabled;"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ searchZipCodeDirect('deliveryRow_0'); }"/>
 	    				<html:image tabindex="610" styleId="deliveryRow_0ZipCodeIcon" src='${f:url("/images//customize/btn_search.png")}' style="vertical-align: middle; cursor: pointer;"/>
 	                </td>
 					<th><div class="col_title_right_req">住所１<bean:message key='labels.must'/></div></th>
 					<td>
-	                    <html:text maxlength="50" styleId="deliveryRow_0Address1" property="newDeliveryAddress1" tabindex="611" style="width:200px;"
+	                    <html:text maxlength="50" styleId="deliveryRow_0Address1" property="newDeliveryAddress1" tabindex="612" style="width:200px;"
 	                    	onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ checkZipCodeAndAddress(this); }"/>
 	                </td>
 					<th><div class="col_title_right">住所２</div></th>
 					<td>
-	                    <html:text maxlength="50" styleId="deliveryRow_0Address2" property="newDeliveryAddress2" tabindex="612" style="width:200px;"/>
+	                    <html:text maxlength="50" styleId="deliveryRow_0Address2" property="newDeliveryAddress2" tabindex="613" style="width:200px;"/>
 	                </td>
 				</tr>
 				<tr id="deliveryRow_0_4">
 					<th><div class="col_title_right">担当者</div></th>
 					<td>
-						<html:text maxlength="60" styleId="deliveryRow_0PcName" property="newDeliveryPcName" tabindex="613" style="width:150px;"/>
+						<html:text maxlength="60" styleId="deliveryRow_0PcName" property="newDeliveryPcName" tabindex="614" style="width:150px;"/>
 	                </td>
 					<th><div class="col_title_right">担当者カナ</div></th>
 					<td>
-						<html:text maxlength="60" styleId="deliveryRow_0PcKana" property="newDeliveryPcKana" tabindex="614" style="width:150px;"
+						<html:text maxlength="60" styleId="deliveryRow_0PcKana" property="newDeliveryPcKana" tabindex="615" style="width:150px;"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 	                </td>
 					<th><div class="col_title_right">敬称</div></th>
 					<td>
-	                    <html:select styleId="deliveryRow_0PcPreCategory" property="newDeliveryPcPreCategory" tabindex="615">
+	                    <html:select styleId="deliveryRow_0PcPreCategory" property="newDeliveryPcPreCategory" tabindex="616">
 	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
 						</html:select>
 	                    <input type="hidden" id="defaultPcPreCategory" name="defaultPcPreCategory" value="">
@@ -1247,19 +1336,21 @@
 				<tr id="deliveryRow_0_5">
 					<th><div class="col_title_right">TEL</div></th>
 					<td>
-						<html:text maxlength="15" styleId="deliveryRow_0Tel" property="newDeliveryTel" tabindex="616" style="width:150px;ime-mode:disabled;"/>
+						<html:text maxlength="15" styleId="deliveryRow_0Tel" property="newDeliveryTel" tabindex="617" style="width:150px;ime-mode:disabled;"/>
 	                </td>
 					<th><div class="col_title_right">FAX</div></th>
 					<td colspan="3">
-	                    <html:text maxlength="15" styleId="deliveryRow_0Fax" property="newDeliveryFax" tabindex="617" style="width:150px;ime-mode:disabled;"/>
+	                    <html:text maxlength="15" styleId="deliveryRow_0Fax" property="newDeliveryFax" tabindex="618" style="width:150px;ime-mode:disabled;"/>
 	                </td>
 				</tr>
 				<tr id="deliveryRow_0_6">
 					<th><div class="col_title_right">E-MAIL</div></th>
 					<td colspan="5">
-						<html:text maxlength="255" styleId="deliveryRow_0Email" property="newDeliveryEmail" tabindex="618" style="width:400px;ime-mode:disabled;"/>
+						<html:text maxlength="255" styleId="deliveryRow_0Email" property="newDeliveryEmail" tabindex="619" style="width:400px;ime-mode:disabled;"/>
 	                </td>
 				</tr>
+	            
+	            
 	            <c:forEach var="deliveryList" varStatus="s" items="${deliveryList}">
 				<tr id="deliveryRow_${s.index+1}_1" style="display: none;">
 					<th><div class="col_title_right_req">納入先名<bean:message key='labels.must'/></div></th>
@@ -1271,6 +1362,24 @@
 					<td colspan="3">
 	                    <html:text maxlength="60" styleId="deliveryRow_${s.index+1}Kana" name="deliveryList" property="deliveryKana" tabindex="-1" indexed="true" style="width:200px;"
 	                    	onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
+					</td>
+				</tr>
+				<tr id="deliveryRow_${s.index+1}_7">
+					<th><div class="col_title_right_req">顧客種別<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="deliveryRow_${s.index+1}Kind" name="deliveryList" property="deliveryKind" tabindex="-1" indexed="true">
+	                        <html:options collection="customerKindList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<th><div class="col_title_right_req">顧客敬称<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="deliveryRow_${s.index+1}PreCategory" name="deliveryList" property="deliveryPreCategory" tabindex="-1" indexed="true">
+	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<td>
+					</td>
+					<td>
 					</td>
 				</tr>
 				<tr id="deliveryRow_${s.index+1}_2" style="display: none;">
@@ -1359,51 +1468,73 @@
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 					</td>
 				</tr>
+
+				<tr>
+					<th><div class="col_title_right_req">顧客種別<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="billTo_deliveryKind" property="billTo.deliveryKind" tabindex="703">
+	                        <html:options collection="customerKindList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<th><div class="col_title_right_req">顧客敬称<bean:message key='labels.must'/></div></th>
+					<td>
+	                    <html:select styleId="billTo_deliveryPreCategory" property="billTo.deliveryPreCategory" tabindex="704">
+	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
+						</html:select>
+					</td>
+					<td>
+					</td>
+					<td>
+					</td>
+				</tr>
+
+
+				
 				<tr>
 					<th><div class="col_title_right">事業所名</div></th>
 					<td>
-						<html:text maxlength="60" styleId="billTo_deliveryOfficeName" property="billTo.deliveryOfficeName" tabindex="703" style="width: 200px;"/>
+						<html:text maxlength="60" styleId="billTo_deliveryOfficeName" property="billTo.deliveryOfficeName" tabindex="705" style="width: 200px;"/>
 	                </td>
 					<th><div class="col_title_right">事業所名カナ</div></th>
 					<td>
-						<html:text maxlength="60" styleId="billTo_deliveryOfficeKana" property="billTo.deliveryOfficeKana" tabindex="704" style="width: 200px;"
+						<html:text maxlength="60" styleId="billTo_deliveryOfficeKana" property="billTo.deliveryOfficeKana" tabindex="706" style="width: 200px;"
 							onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 	                </td>
 					<th><div class="col_title_right">部署名</div></th>
 					<td>
-						<html:text maxlength="60" styleId="billTo_deliveryDeptName" property="billTo.deliveryDeptName" tabindex="705" style="width: 200px;"/>
+						<html:text maxlength="60" styleId="billTo_deliveryDeptName" property="billTo.deliveryDeptName" tabindex="707" style="width: 200px;"/>
 	                </td>
 				</tr>
 				<tr>
 					<th><div class="col_title_right_req">郵便番号<bean:message key='labels.must'/></div></th>
 					<td>
-	                    <html:text maxlength="8" styleId="billTo_deliveryZipCode" property="billTo.deliveryZipCode" tabindex="706" style="width: 100px;ime-mode:disabled;"
+	                    <html:text maxlength="8" styleId="billTo_deliveryZipCode" property="billTo.deliveryZipCode" tabindex="708" style="width: 100px;ime-mode:disabled;"
 	                    	onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ searchZipCodeDirect('billTo_delivery'); }" />
 	    				<html:image tabindex="707" src='${f:url("/images//customize/btn_search.png")}' style="vertical-align: middle; cursor: pointer;" onclick="searchZipCode('billTo_delivery');" />
 	                </td>
 					<th><div class="col_title_right_req">住所１<bean:message key='labels.must'/></div></th>
 	                <td>
-	                    <html:text maxlength="50" styleId="billTo_deliveryAddress1" property="billTo.deliveryAddress1" tabindex="708" style="width: 200px"
+	                    <html:text maxlength="50" styleId="billTo_deliveryAddress1" property="billTo.deliveryAddress1" tabindex="709" style="width: 200px"
 	                    	onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ checkZipCodeAndAddress(this); }"/>
 	                </td>
 					<th><div class="col_title_right">住所２</div></th>
 					<td>
-	                    <html:text maxlength="50" styleId="billTo_deliveryAddress2" property="billTo.deliveryAddress2" tabindex="709" style="width: 200px"/>
+	                    <html:text maxlength="50" styleId="billTo_deliveryAddress2" property="billTo.deliveryAddress2" tabindex="710" style="width: 200px"/>
 	                </td>
 				</tr>
 				<tr>
 					<th><div class="col_title_right">担当者</div></th>
 					<td>
-	                    <html:text maxlength="60" styleId="billTo_deliveryPcName" property="billTo.deliveryPcName" tabindex="710" style="width: 200px"/>
+	                    <html:text maxlength="60" styleId="billTo_deliveryPcName" property="billTo.deliveryPcName" tabindex="711" style="width: 200px"/>
 	                </td>
 					<th><div class="col_title_right">担当者カナ</div></th>
 					<td>
-	                    <html:text maxlength="60" styleId="billTo_deliveryPcKana" property="billTo.deliveryPcKana" tabindex="711" style="width: 200px"
+	                    <html:text maxlength="60" styleId="billTo_deliveryPcKana" property="billTo.deliveryPcKana" tabindex="712" style="width: 200px"
 	                    	onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ this.value=convertHKanaToKKana(this.value); }"/>
 	                </td>
 					<th><div class="col_title_right">敬称</div></th>
 					<td>
-	                    <html:select styleId="billTo_deliveryPcPreCategory" property="billTo.deliveryPcPreCategory" tabindex="712">
+	                    <html:select styleId="billTo_deliveryPcPreCategory" property="billTo.deliveryPcPreCategory" tabindex="713">
 	                        <html:options collection="preTypeCategoryList" property="value" labelProperty="label"/>
 						</html:select>
 	                </td>
@@ -1411,17 +1542,17 @@
 				<tr>
 					<th><div class="col_title_right">TEL</div></th>
 					<td>
-	                    <html:text maxlength="15" styleId="billTo_deliveryTel" property="billTo.deliveryTel" tabindex="713" style="width: 200px;ime-mode:disabled;"/>
+	                    <html:text maxlength="15" styleId="billTo_deliveryTel" property="billTo.deliveryTel" tabindex="714" style="width: 200px;ime-mode:disabled;"/>
 	                </td>
 					<th><div class="col_title_right">FAX</div></th>
 					<td colspan="3">
-	                    <html:text maxlength="15" styleId="billTo_deliveryFax" property="billTo.deliveryFax" tabindex="714" style="width: 200px;ime-mode:disabled;"/>
+	                    <html:text maxlength="15" styleId="billTo_deliveryFax" property="billTo.deliveryFax" tabindex="715" style="width: 200px;ime-mode:disabled;"/>
 	                </td>
 				</tr>
 				<tr>
 					<th><div class="col_title_right">E-MAIL</div></th>
 					<td colspan="5">
-	                    <html:text maxlength="255" styleId="billTo_deliveryEmail" property="billTo.deliveryEmail" tabindex="715" style="width: 400px;ime-mode:disabled;"/>
+	                    <html:text maxlength="255" styleId="billTo_deliveryEmail" property="billTo.deliveryEmail" tabindex="716" style="width: 400px;ime-mode:disabled;"/>
 	                </td>
 				</tr>
 			</table>

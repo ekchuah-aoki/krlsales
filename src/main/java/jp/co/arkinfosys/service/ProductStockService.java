@@ -23,6 +23,7 @@ import org.seasar.struts.util.MessageResourcesUtil;
 import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.StockInfoDto;
+import jp.co.arkinfosys.dto.StockMadeDateInfoDto;
 import jp.co.arkinfosys.dto.YmDto;
 import jp.co.arkinfosys.entity.ProductMadeDateStockTrn;
 import jp.co.arkinfosys.entity.ProductStockTrn;
@@ -34,6 +35,7 @@ import jp.co.arkinfosys.entity.join.ProductSetJoin;
 import jp.co.arkinfosys.entity.join.ProductStockJoin;
 import jp.co.arkinfosys.entity.join.RackJoin;
 import jp.co.arkinfosys.entity.join.RorderRestDetail;
+import jp.co.arkinfosys.entity.join.StockMadeDateQuantity;
 import jp.co.arkinfosys.entity.join.StockQuantity;
 import jp.co.arkinfosys.service.exception.ServiceException;
 
@@ -53,6 +55,7 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 	public static class Param {
 		public static final String RACK_CODE = "rackCode";
 		public static final String PRODUCT_CODE = "productCode";
+		public static final String MADE_DATE = "madeDate";
 		public static final String STOCK_PDATE = "stockPdate";
 		public static final String STOCK_ANNUAL = "stockAnnual";
 		public static final String STOCK_MONTHLY = "stockMonthly";
@@ -112,6 +115,28 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 		return 0;
 	}
 
+	/**
+	 * 商品コードと棚番コードを指定して、前回の在庫締時点での自社倉庫における商品製造年月日別在庫数を返します.
+	 * @param productCode 商品コード
+	 * @param rackCode 棚番コード
+	 * @return 商品製造年月日別在庫数リスト
+	 * @throws ServiceException
+	 */
+	public List<StockMadeDateQuantity> countClosedMadeDateQuantityByProductCode(String productCode,
+			String rackCode) throws ServiceException {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put(ProductStockService.Param.PRODUCT_CODE,
+				new String[] { productCode });
+		param.put(ProductStockService.Param.RACK_CODE, rackCode);
+		param.put(ProductStockService.Param.RACK_CATEGORY, null);
+
+		List<StockMadeDateQuantity> quantityList = this
+				.countClosedMadeDateQuantityByProductCode(param);
+
+		return quantityList;
+	}
+	
+	
 	/**
 	 * 商品コードを指定して、前回の在庫締時点での自社倉庫における商品在庫数を返します.
 	 * @param productCode 商品コード
@@ -218,6 +243,45 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 		}
 	}
 
+	/**
+	 * 検索条件を指定して、商品製造年月日別在庫情報のリストを返します.
+	 * @param conditions 検索条件のマップ
+	 * @return 商品在庫情報{@link StockQuantity}のリスト
+	 * @throws ServiceException
+	 */
+	private List<StockMadeDateQuantity> countClosedMadeDateQuantityByProductCode(
+			Map<String, Object> conditions) throws ServiceException {
+		try {
+			Map<String, Object> params = super.createSqlParam();
+
+			// 棚区分コード
+			if (conditions.containsKey(ProductStockService.Param.RACK_CATEGORY)) {
+				params.put(ProductStockService.Param.RACK_CATEGORY, conditions
+						.get(ProductStockService.Param.RACK_CATEGORY));
+			}
+
+			// 棚コード
+			if (conditions.containsKey(ProductStockService.Param.RACK_CODE)) {
+				params.put(ProductStockService.Param.RACK_CODE, conditions
+						.get(ProductStockService.Param.RACK_CODE));
+			}
+
+			// 商品コード
+			if (conditions.containsKey(ProductStockService.Param.PRODUCT_CODE)) {
+				params.put(ProductStockService.Param.PRODUCT_CODE, conditions
+						.get(ProductStockService.Param.PRODUCT_CODE));
+			}
+
+			return this
+					.selectBySqlFile(
+							StockMadeDateQuantity.class,
+							"productstock/CountClosedMadeDateQuantityByProductCode.sql",
+							params).getResultList();
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}	
+	
 	/**
 	 * 商品コードを指定して、商品の在庫数情報を返します.
 	 * @param productCode 商品コード
@@ -541,6 +605,27 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 	}
 
 	/**
+	 * 商品在庫情報を登録します.
+	 * @param productMadedateStockTrnList 商品製造年月日別在庫情報
+	 * @return 登録した件数
+	 * @throws ServiceException
+	 */
+	public int insertProductMadedteStock(ProductMadeDateStockTrn productMadedateStockTrn)
+			throws ServiceException {
+		try {
+			
+			// SQLパラメータを構築する
+			Map<String, Object> param = createSqlParam4MadeDate(productMadedateStockTrn);
+			return this.updateBySqlFile("productstock/InsertProductMadeDateStock.sql",
+					param).execute();
+		} catch (Exception e) {
+			ServiceException se = new ServiceException(e);
+			se.setStopOnError(true);
+			throw se;
+		}
+	}
+
+	/**
 	 * 商品在庫情報を削除します.
 	 * @param productStockTrn 商品在庫情報
 	 * @return 削除した件数
@@ -573,6 +658,40 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 			throw se;
 		}
 	}
+	
+	/**
+	 * 商品製造年月日在庫情報を削除します.
+	 * @param productStockTrn 商品在庫情報
+	 * @return 削除した件数
+	 * @throws ServiceException
+	 */
+	public int deleteProductMadeDateStockByCode(ProductStockTrn productStockTrn)
+			throws ServiceException {
+		try {
+			// SQLパラメータを構築する
+			Map<String, Object> param = super.createSqlParam();
+			param.put(Param.RACK_CODE, productStockTrn.rackCode);
+			param.put(Param.PRODUCT_CODE, productStockTrn.productCode);
+			param.put(Param.STOCK_ANNUAL, productStockTrn.stockAnnual);
+			param.put(Param.STOCK_MONTHLY, productStockTrn.stockMonthly);
+
+			super
+					.updateAudit(ProductStockTrn.TABLE_NAME, new String[] {
+							Param.RACK_CODE, Param.PRODUCT_CODE,
+							Param.STOCK_ANNUAL, Param.STOCK_MONTHLY },
+							new Object[] { productStockTrn.rackCode,
+									productStockTrn.productCode,
+									productStockTrn.stockAnnual,
+									productStockTrn.stockMonthly });
+			return this.updateBySqlFile(
+					"productstock/DeleteProductMadeDateStockByCode.sql", param)
+					.execute();
+		} catch (Exception e) {
+			ServiceException se = new ServiceException(e);
+			se.setStopOnError(true);
+			throw se;
+		}
+	}	
 
 	/**
 	 * SQLパラメータマップを作成します.
@@ -591,6 +710,26 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 		param.put(Param.ENTER_NUM, productStockTrn.enterNum);
 		param.put(Param.DISPATCH_NUM, productStockTrn.dispatchNum);
 		param.put(Param.REMARKS, productStockTrn.remarks);
+		return param;
+	}
+	/**
+	 * SQLパラメータマップを作成します.
+	 * @param productStockTrn 商品在庫情報
+	 * @return パラメータマップ
+	 */
+	protected Map<String, Object> createSqlParam4MadeDate(ProductMadeDateStockTrn productMadeDateStockTrn) {
+		Map<String, Object> param = super.createSqlParam();
+		param.put(Param.RACK_CODE, productMadeDateStockTrn.rackCode);
+		param.put(Param.PRODUCT_CODE, productMadeDateStockTrn.productCode);
+		param.put(Param.MADE_DATE, productMadeDateStockTrn.madeDate);
+		param.put(Param.STOCK_PDATE, productMadeDateStockTrn.stockPdate);
+		param.put(Param.STOCK_ANNUAL, productMadeDateStockTrn.stockAnnual);
+		param.put(Param.STOCK_MONTHLY, productMadeDateStockTrn.stockMonthly);
+		param.put(Param.STOCK_YM, productMadeDateStockTrn.stockYm);
+		param.put(Param.STOCK_NUM, productMadeDateStockTrn.stockNum);
+		param.put(Param.ENTER_NUM, productMadeDateStockTrn.enterNum);
+		param.put(Param.DISPATCH_NUM, productMadeDateStockTrn.dispatchNum);
+		param.put(Param.REMARKS, productMadeDateStockTrn.remarks);
 		return param;
 	}
 
@@ -869,6 +1008,7 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 				}
 			}
 			// セット品
+			// TODO: セット商品は未対応
 			else if (CategoryTrns.PRODUCT_SET_TYPE_SET
 					.equals(product.setTypeCategory)) {
 				
@@ -1000,6 +1140,202 @@ public class ProductStockService extends AbstractService<ProductStockTrn> {
 					resultList.add(result);
 					
 				}
+
+			}
+			
+			return resultList;
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+	
+
+	/**
+	 * AOKI 商品コード、棚番を指定して、商品の製造年月日別在庫数情報を返します.
+	 * セット商品
+	 * @param productCode 商品コード
+	 * @param rackCode 棚コード
+	 * @param productTypeCategory セット商品フラグ
+	 * @return 在庫数情報{@link StockInfoDto}
+	 * @throws ServiceException
+	 */
+	public List<StockMadeDateInfoDto> calcStockRackMadedateQuantityByProductRackCode(String productCode, String rackCode, String productTypeCategory)
+			throws ServiceException {
+		List<StockMadeDateInfoDto> resultList = new ArrayList<StockMadeDateInfoDto>();
+		if (!StringUtil.hasLength(productCode)) {
+			return resultList;
+		}
+
+		try {
+
+
+			// 単品
+			
+			if (CategoryTrns.PRODUCT_SET_TYPE_SINGLE
+					.equals(productTypeCategory)) {
+
+					StockMadeDateInfoDto result = new StockMadeDateInfoDto();
+
+					result.setQuantityFormatOptions(super.mineDto.productFractCategory, super.mineDto.numDecAlignment);
+					
+					// 自社倉庫への当月入出庫分
+					List<StockMadeDateQuantity> currentMonthStockList = this.eadService
+							.countUnclosedMadedateQuantityByProductCode(productCode, rackCode);
+	
+					// 自社倉庫の前回締め時点での在庫数
+					List<StockMadeDateQuantity> prevMonthStockList = this
+							.countClosedMadeDateQuantityByProductCode(productCode, rackCode);
+	
+					
+					//自社倉庫への当月入出庫分と自社倉庫の前回締め時点での在庫数でマージする
+					
+					
+					
+					//在庫０なので無視
+					//if( currentMonthStock==0 && prevMonthStock==0){
+					//	continue;
+					//}
+					
+					
+					// 現在庫総数
+					//result.currentTotalQuantity = currentMonthStock
+					//		+ prevMonthStock;
+					
+					resultList.add(result);
+					
+			}
+			// セット品
+			// TODO: セット商品は未対応
+			else if (CategoryTrns.PRODUCT_SET_TYPE_SET
+					.equals(productTypeCategory)) {
+/*
+				StockInfoDto result = new StockInfoDto();
+
+				result.setQuantityFormatOptions(super.mineDto.productFractCategory, super.mineDto.numDecAlignment);
+
+				Beans.copy(product, result).execute();
+				
+				
+				// セット商品の内訳商品を全て取得する
+				List<ProductSetJoin> productSetList = this.productSetService
+						.findProductSetByProductCode(productCode);
+				if (productSetList != null && productSetList.size() > 0) {
+
+					String[] productCodeArray = new String[productSetList
+							.size()];
+					for (int i = 0; i < productSetList.size(); i++) {
+						productCodeArray[i] = productSetList.get(i).productCode;
+					}
+
+					// 各商品の自社倉庫への当月入出庫分
+					List<StockQuantity> stockQuantityList = this.eadService
+							.countUnclosedQuantityByProductCode(productCodeArray);
+					Map<String, BigDecimal> productQuantityMap = new HashMap<String, BigDecimal>();
+					for (StockQuantity stockQuantity : stockQuantityList) {
+						if (stockQuantity.quantity != null) {
+							productQuantityMap.put(stockQuantity.productCode,
+									stockQuantity.quantity);
+						}
+					}
+
+					// 各商品の自社倉庫の前回締め時点での在庫数
+					stockQuantityList = this
+							.countClosedQuantityByProductCode(productCodeArray);
+					for (StockQuantity stockQuantity : stockQuantityList) {
+						if (stockQuantity.quantity != null) {
+							BigDecimal dec = productQuantityMap
+									.get(stockQuantity.productCode);
+							if (dec != null) {
+								productQuantityMap.put(
+										stockQuantity.productCode, dec.add(
+												stockQuantity.quantity,
+												MathContext.UNLIMITED));
+								continue;
+							}
+							productQuantityMap.put(stockQuantity.productCode,
+									stockQuantity.quantity);
+						}
+					}
+
+					// 在庫数量をセット数で割った場合に、最も小さい値となる商品の値を採用
+					BigDecimal minQuantity = null;
+					for (ProductSetJoin productSet : productSetList) {
+						if (productQuantityMap
+								.containsKey(productSet.productCode)) {
+							BigDecimal temp = productQuantityMap.get(
+									productSet.productCode).divide(
+									productSet.quantity, RoundingMode.DOWN);
+							if (minQuantity == null) {
+								minQuantity = temp;
+								continue;
+							}
+
+							if (minQuantity.compareTo(temp) > 0) {
+								minQuantity = temp;
+							}
+							continue;
+						}
+						// 数量が存在しない商品があった時点で終了（セット品としての在庫が不成立）
+						minQuantity = new BigDecimal(0);
+						break;
+					}
+
+					// 現在庫総数
+					result.currentTotalQuantity = minQuantity.intValue();
+
+
+					// 子商品の受注残数を加味して引当可能数を算出する
+					Iterator<Entry<String, BigDecimal>> entryIterator = productQuantityMap
+							.entrySet().iterator();
+					while (entryIterator.hasNext()) {
+						Entry<String, BigDecimal> entry = entryIterator.next();
+						String key = entry.getKey();
+						// 受注残数
+						int rest = this.roSlipService
+								.countRestQuantityByProductCode(key);
+						if (rest != 0) {
+							productQuantityMap.put(key, entry.getValue()
+									.subtract(new BigDecimal(rest)));
+						}
+					}
+
+					// 在庫数量をセット数で割った場合に、最も小さい値となる商品の値を採用
+					minQuantity = null;
+					for (ProductSetJoin productSet : productSetList) {
+						if (productQuantityMap
+								.containsKey(productSet.productCode)) {
+							BigDecimal temp = productQuantityMap.get(
+									productSet.productCode).divide(
+									productSet.quantity, RoundingMode.DOWN);
+							if (minQuantity == null) {
+								minQuantity = temp;
+								continue;
+							}
+
+							if (minQuantity.compareTo(temp) > 0) {
+								minQuantity = temp;
+							}
+							continue;
+						}
+						// 数量が存在しない商品があった時点で終了（セット品としての在庫が不成立）
+						minQuantity = new BigDecimal(0);
+						break;
+					}
+
+					// 引当可能数
+					result.possibleDrawQuantity = minQuantity.intValue();
+					
+					// 受注残数
+					result.rorderRestQuantity = this.roSlipService
+							.countRestQuantityByProductCode(productCode);
+
+					// 保有数
+					result.holdingStockQuantity = result.currentTotalQuantity
+							+ result.entrustStockQuantity + result.porderRestQuantity
+							+ result.entrustRestQuantity - result.rorderRestQuantity;
+					
+					resultList.add(result);
+*/
 
 			}
 			

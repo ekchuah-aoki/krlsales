@@ -14,10 +14,12 @@ import jp.co.arkinfosys.dto.AbstractLineDto;
  * @author 
  * 
  */
-public class EadMadeDateTrnDto extends AbstractLineDto implements Serializable {
+public class EadMadedateTrnDto extends AbstractLineDto implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	public String eadMadedateId;
+	
 	public String eadSlipId;
 
 	public String productCode;
@@ -71,8 +73,8 @@ public class EadMadeDateTrnDto extends AbstractLineDto implements Serializable {
 	 * 出庫情報のDTOから入庫情報のDTOを作成します.
 	 * @return 入庫明細行情報のDTO
 	 */
-	public EadMadeDateTrnDto createStockDto() {
-		EadMadeDateTrnDto stockLineDto = new EadMadeDateTrnDto();
+	public EadMadedateTrnDto createStockDto() {
+		EadMadedateTrnDto stockLineDto = new EadMadedateTrnDto();
 		// 共通
 		stockLineDto.eadSlipId = this.eadSlipId;
 		stockLineDto.productCode = this.productCode;

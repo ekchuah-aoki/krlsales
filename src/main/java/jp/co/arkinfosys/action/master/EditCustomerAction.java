@@ -577,6 +577,13 @@ public class EditCustomerAction extends AbstractEditAction<CustomerDto, Customer
 		// 請求書日付有無
 		this.editCustomerForm.billDatePrintList = categoryService
 				.findCategoryLabelValueBeanListById(Categories.BILL_DATE_PRINT);
+		
+		// 顧客種別
+		this.editCustomerForm.customerKindList = categoryService
+				.findCategoryLabelValueBeanListById(Categories.CUSTOMER_KIND);
+		// 先頭に空白を入れる
+		this.editCustomerForm.customerKindList.add(0, new LabelValueBean());
+		
 	}
 
 	/**

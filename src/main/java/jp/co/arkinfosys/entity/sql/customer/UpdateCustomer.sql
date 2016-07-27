@@ -39,5 +39,8 @@ CUSTOMER_NAME=/*customerName*/
 ,UPD_DATETM=now()
 ,UPD_USER=/*updUser*/
 ,LAST_SALES_CUTOFF_DATE=/*lastSalesCutoffDate*/
+,CUSTOMER_KIND=/*customerKind*/
+,CUSTOMER_PRE_CATEGORY=/*customerPreCategory*/
+
 WHERE
 CUSTOMER_CODE=/*customerCode*/

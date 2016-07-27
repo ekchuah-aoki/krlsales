@@ -5,6 +5,7 @@ package jp.co.arkinfosys.dto;
 
 import java.io.Serializable;
 import java.text.DecimalFormat;
+import java.util.List;
 
 import jp.co.arkinfosys.common.NumberUtil;
 
@@ -134,6 +135,11 @@ public class StockInfoDto implements Serializable {
 	 * 委託残数
 	 */
 	public int entrustRestQuantity = 0;
+	
+	/**
+	 * 製造年月日別在庫情報
+	 */
+	public List<StockMadeDateInfoDto> madeDateStockList;
 
 	/**
 	 * カンマ付きフォーマットの月平均出荷数を取得します.

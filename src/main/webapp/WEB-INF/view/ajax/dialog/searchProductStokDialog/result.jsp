@@ -11,6 +11,8 @@
 	</tr>
 </table>
 
+
+
 <div id="${dialogId}Div"
 	style="border: none; width: 730px; height: 320px; overflow: hidden;">
 <table class="dialog_resultList"  id="${dialogId}List" summary="商品検索結果" style="width: 100%;">

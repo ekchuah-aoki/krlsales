@@ -6,6 +6,8 @@ package jp.co.arkinfosys.dto.master;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+import org.seasar.struts.annotation.Required;
+
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.entity.Customer;
 /**
@@ -26,6 +28,12 @@ public class CustomerDto implements Serializable, MasterEditDto {
 	public String customerName;
 
 	public String customerKana;
+	
+	/** 顧客種別 */
+	public String customerKind;
+	
+	/** 顧客敬称 */
+	public String customerPreCategory;
 
 	public String customerOfficeName;
 
@@ -234,6 +242,14 @@ public class CustomerDto implements Serializable, MasterEditDto {
 		}
 		// 顧客名カナ
 		if( !checkEquals( dto.customerKana, customerKana ) ){
+			return false;
+		}
+		// 顧客種別
+		if( !checkEquals( dto.customerKind, customerKind ) ){
+			return false;
+		}
+		// 顧客敬称
+		if( !checkEquals( dto.customerPreCategory, customerPreCategory ) ){
 			return false;
 		}
 		// 事業所名

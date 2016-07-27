@@ -23,6 +23,7 @@ import jp.co.arkinfosys.common.CategoryTrns;
 import jp.co.arkinfosys.common.Constants;
 import jp.co.arkinfosys.common.StringUtil;
 import jp.co.arkinfosys.dto.YmDto;
+import jp.co.arkinfosys.entity.EadMadedateTrn;
 import jp.co.arkinfosys.entity.EadSlipTrn;
 import jp.co.arkinfosys.entity.ProductMadeDateStockTrn;
 import jp.co.arkinfosys.entity.ProductStockTrn;
@@ -178,6 +179,10 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 						param, productStockTrn.updDatetm);
 				// 商品在庫を削除する
 				productStockService.deleteProductStockByCode(productStockTrn);
+				
+				//商品製造年月日在庫を削除する
+				productStockService.deleteProductMadeDateStockByCode(productStockTrn);
+				
 			}
 
 			// 入出庫伝票の締解除
@@ -220,15 +225,15 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 
 			BigDecimal lastStockNum = BigDecimal.ZERO;
 			
-			Map<Date, BigDecimal> madeDateStockNum = new HashMap<Date, BigDecimal>();
+			Map<Date, BigDecimal> lastmadeDateStockNumMap = new HashMap<Date, BigDecimal>();
 			
 			if(lastProductStock != null) {
 				lastStockNum = lastProductStock.stockNum;
 				
 				//製造年月日別在庫情報を取得
 				List<ProductMadeDateStockTrn> adeDateStockList = productStockService.findProductMadeDateStockTrn(lastProductStock);
-				for(ProductMadeDateStockTrn dto : adeDateStockList){
-					madeDateStockNum.put(dto.madeDate, dto.stockNum);
+				for(ProductMadeDateStockTrn trn : adeDateStockList){
+					lastmadeDateStockNumMap.put(trn.madeDate, trn.stockNum);
 				}
 				
 			}
@@ -255,7 +260,7 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 					result.put(eadSlipTrn.eadSlipId, eadSlipTrn);
 				}
 			}
-
+			
 			// 年月度を取得
 			YmDto ymDto = ymService.getYm(cutoffDate);
 			if(ymDto == null) {
@@ -265,11 +270,12 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 				throw se;
 			}
 
+			DateFormat foramt = new SimpleDateFormat(Constants.FORMAT.DATE);
+
 			// 商品在庫情報を生成
 			ProductStockTrn productStockTrn = new ProductStockTrn();
 			productStockTrn.rackCode = rackCode;
 			productStockTrn.productCode = productCode;
-			DateFormat foramt = new SimpleDateFormat(Constants.FORMAT.DATE);
 			productStockTrn.stockPdate = super.convertUtilDateToSqlDate(foramt.parse(cutoffDate));
 			productStockTrn.stockAnnual = ymDto.annual.shortValue();
 			productStockTrn.stockMonthly = ymDto.monthly.shortValue();
@@ -281,6 +287,75 @@ public class CloseStockService extends AbstractService<EadSlipTrn> {
 
 			// 商品在庫をInsert
 			productStockService.insertProductStock(productStockTrn);
+			
+			//商品・棚・製造年月日ごとの在庫数を取得
+			//上で処理した入出庫伝票をもとに
+			List<ProductMadeDateStockTrn> productMadedateStockTrnList = new ArrayList<ProductMadeDateStockTrn>();
+			for(Integer slipId : result.keySet()){
+				
+				EadSlipTrn eadSlipTrn = result.get(slipId);
+				
+				List<EadMadedateTrn> eadMadedateTrnList = eadService.findMadedateByEadSlipId(slipId);
+				
+				for(EadMadedateTrn eadMadedateTrn : eadMadedateTrnList){
+					
+					BigDecimal enterQuantity2 = BigDecimal.ZERO;
+					BigDecimal dispatchQuantity2 = BigDecimal.ZERO;					
+					// 入出庫数を取得する
+					if(CategoryTrns.EAD_CATEGORY_ENTER.equals(eadSlipTrn.eadCategory)) {
+						// 入庫の場合
+						enterQuantity2 = eadMadedateTrn.quantity;
+					} else if(CategoryTrns.EAD_CATEGORY_DISPATCH.equals(eadSlipTrn.eadCategory)) {
+						// 出庫の場合
+						dispatchQuantity2 = eadMadedateTrn.quantity;
+					}
+					
+					
+					
+					//同一商品・棚・製造年月日のデータを検索
+					ProductMadeDateStockTrn productMadedateStockTrn = null;
+					
+					for(ProductMadeDateStockTrn pmsTrn : productMadedateStockTrnList){
+						if( pmsTrn.productCode.equals(eadMadedateTrn.productCode)
+								&& pmsTrn.rackCode.equals(eadMadedateTrn.rackCode)
+								&& pmsTrn.madeDate.equals(eadMadedateTrn.madeDate)){
+							productMadedateStockTrn = pmsTrn;
+							break;
+						}
+					}
+					
+					//新規なら
+					if(productMadedateStockTrn==null){
+						
+						BigDecimal lastmadeDateStockNum = lastmadeDateStockNumMap.get(eadMadedateTrn.madeDate);
+						
+						if(lastmadeDateStockNum==null){
+							lastmadeDateStockNum = BigDecimal.ZERO;
+						}
+						
+						productMadedateStockTrn = new ProductMadeDateStockTrn();
+						productMadedateStockTrn.rackCode = rackCode;
+						productMadedateStockTrn.productCode = productCode;
+						productMadedateStockTrn.stockPdate = productStockTrn.stockPdate;
+						productMadedateStockTrn.stockAnnual = productStockTrn.stockAnnual;
+						productMadedateStockTrn.stockMonthly = productStockTrn.stockMonthly;
+						productMadedateStockTrn.stockYm = productStockTrn.stockYm;
+						productMadedateStockTrn.stockNum = lastmadeDateStockNum;
+						productMadedateStockTrn.enterNum = BigDecimal.ZERO;
+						productMadedateStockTrn.dispatchNum = BigDecimal.ZERO;
+						productMadedateStockTrn.remarks = "";
+						
+						productMadedateStockTrnList.add(productMadedateStockTrn);
+					}
+					
+					productMadedateStockTrn.stockNum = productMadedateStockTrn.stockNum.add(enterQuantity2.subtract(dispatchQuantity2));
+					productMadedateStockTrn.enterNum = productMadedateStockTrn.enterNum.add(enterQuantity2);
+					productMadedateStockTrn.dispatchNum = productMadedateStockTrn.dispatchNum.add(dispatchQuantity2);
+				}
+			}
+			for(ProductMadeDateStockTrn trn : productMadedateStockTrnList){
+				productStockService.insertProductMadedteStock(trn);
+			}
 
 			return result;
 		} catch(ServiceException e) {

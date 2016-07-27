@@ -50,6 +50,12 @@ public class Delivery extends AuditInfo {
 
 	public String remarks;
 
+	/**納品先種別*/
+	public String deliveryKind;
+
+	/**納品先敬称*/
+	public String deliveryPreCategory;
+	
 	/**
 	 * エンティティを比較します.
 	 * @param src　比較するエンティティ
@@ -69,6 +75,16 @@ public class Delivery extends AuditInfo {
 		// 納入先名カナ
 		if( deliveryKana != null
 			&& !deliveryKana.equals( src.deliveryKana ) ){
+			return false;
+		}
+		// 納入先種別
+		if( deliveryKind != null
+			&& !deliveryKind.equals( src.deliveryKind ) ){
+			return false;
+		}
+		// 納入先敬称
+		if( deliveryPreCategory != null
+			&& !deliveryPreCategory.equals( src.deliveryPreCategory ) ){
 			return false;
 		}
 		// 事業所名

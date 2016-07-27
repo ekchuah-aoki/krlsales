@@ -18,5 +18,8 @@ UPDATE DELIVERY_MST_/*$domainId*/ SET
 	,UPD_FUNC=/*updFunc*/
 	,UPD_DATETM=now()
 	,UPD_USER=/*updUser*/
+	,DELIVERY_KIND=/*deliveryKind*/
+	,DELIVERY_PRE_CATEGORY=/*deliveryPreCategory*/
+	
 WHERE
     DELIVERY_CODE=/*deliveryCode*/
