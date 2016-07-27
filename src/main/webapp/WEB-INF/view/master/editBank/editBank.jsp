@@ -161,13 +161,14 @@
 						<tr>
 							<th><div class="col_title_right_req">口座名義<bean:message key='labels.must'/></div></th>
 							<td colspan="3">
-								<html:text tabindex="106" maxlength="20" styleId="accountOwnerName" property="accountOwnerName" style="width: 200px;ime-mode:disabled;"/>
+								
+								<html:text tabindex="106" maxlength="20" styleId="accountOwnerName" property="accountOwnerName" style="width: 200px;"/>
 							</td>
 						</tr>
 						<tr>
 							<th><div class="col_title_right_req">口座名義カナ<bean:message key='labels.must'/></div></th>
 							<td colspan="3">
-								<html:text tabindex="107" maxlength="20" styleId="accountOwnerKana" property="accountOwnerKana" style="width: 200px;ime-mode:disabled;"/>
+								<html:text tabindex="107" maxlength="20" styleId="accountOwnerKana" property="accountOwnerKana" style="width: 200px;"/>
 							</td>
 						</tr>
 						<tr>
