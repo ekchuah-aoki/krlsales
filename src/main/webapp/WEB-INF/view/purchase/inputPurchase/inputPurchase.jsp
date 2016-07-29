@@ -871,29 +871,30 @@
 					</colgroup>
 					<thead>
 						<tr>
-							<th class="rd_top_left" style="height:60px;" rowspan="3">No</th>
+							<th class="rd_top_left" style="height:60px;" rowspan="4">No</th>
 							<th style="height:20px;">&nbsp;</th>
-							<th style="height:30px; border-bottom:1px solid #555555;">商品コード※</th>
-							<th style="height:30px; border-bottom:1px solid #555555;">相手品番</th>
+							<th style="height:30px; border-bottom:1px solid #555555;" rowspan="2" >商品コード※</th>
+							<th style="height:30px; border-bottom:1px solid #555555;" rowspan="2" >相手品番</th>
 							<th style="height:20px;">数量※</th>
 							<th style="height:20px;">未納数</th>
 							<th style="height:20px;"style="height:30px;">備考</th>
-							<th class="rd_top_right" style="height:60px;" rowspan="3">&nbsp;</th>
+							<th class="rd_top_right" style="height:60px;" rowspan="4">&nbsp;</th>
 						</tr>
 						<tr>
 							<th style="height:20px;">完納区分</th>
-							<th style="height:20px;" colspan="2" rowspan="2">商品名・摘要</th>
 							<th style="height:20px;">円単価<span class="yenMust"><bean:message key='labels.must'/></span></th>
 							<th style="height:20px;">金額(円)<span class="yenMust"><bean:message key='labels.must'/></span></th>
-							<th style="height:20px;">倉庫名</th>
+							<th style="height:20px;" rowspan="2">倉庫名</th>
 						</tr>
 						<tr>
 							<th style="height:20px;">納期</th>
-							<th colspan="2" style="height:20px;">製造年月日<span class="yenMust"><bean:message key='labels.must'/></span></th>
-							<!-- 
+							<th style="height:20px;" colspan="2" rowspan="2">商品名・摘要</th>
 							<th style="height:20px;">外貨単価<span class="dolMust"><bean:message key='labels.must'/></span></th>
 							<th style="height:20px;">外貨金額<span class="dolMust"><bean:message key='labels.must'/></span></th>
-							 -->
+						</tr>
+						<tr>
+							<th style="height:20px;">&nbsp;</th>
+							<th colspan="2" style="height:20px;">製造年月日<span class="yenMust"><bean:message key='labels.must'/></span></th>
 							<th style="height:20px;">棚番※</th>
 						</tr>
 					</thead>
@@ -942,33 +943,33 @@
 
 								<!-- 商品コード※/相手品番/商品名・摘要 -->
 								<td colspan="2">
-									<div class="box_1of3" style="height: 50px;">
+									<div class="box_1of3" style="height: 69px;">
 										<div style="float: left; background-color: #fae4eb;">
 											&nbsp;
 											<html:text name="lineDtoList" property="productCode" indexed="true" styleId="lineDtoList[${status.index}].productCode"
-												styleClass="${ copySlip ? 'c_disable' : ''} goods_code c_referable" style="width: 140px; height: 30px; ime-mode:disabled; margin:10px 0;"  tabindex="<%=String.valueOf(lineTab++) %>" readonly="${copySlip}"/>
+												styleClass="${ copySlip ? 'c_disable' : ''} goods_code c_referable" style="width: 140px; height: 30px; ime-mode:disabled; margin-top:19px; margin-bottom:20px;"  tabindex="<%=String.valueOf(lineTab++) %>" readonly="${copySlip}"/>
 
 											<c:if test="${!copySlip}">
 												<html:image src="${f:url('/images/customize/btn_search.png')}" styleId="productCodeImg${status.index}"
-													style="width: 25px; height: 25px; vertical-align: middle; cursor: pointer;"  tabindex="<%=String.valueOf(lineTab++) %>" />
+													style="width: 25px; height: 25px; vertical-align: middle; cursor: pointer;"   tabindex="<%=String.valueOf(lineTab++) %>" />
 											</c:if>
 											&nbsp;
 										</div>
 										<div style="float:right">
-											<html:text name="lineDtoList" property="supplierPcode" indexed="true" styleId="lineDtoList[${status.index}].supplierPcode" styleClass="c_disable"  readonly="true" style="width: 155px; height: 30px; margin: 10px 0;"  tabindex="<%=String.valueOf(lineTab++) %>" />&nbsp;
+											<html:text name="lineDtoList" property="supplierPcode" indexed="true" styleId="lineDtoList[${status.index}].supplierPcode" styleClass="c_disable"  readonly="true" style="width: 155px; height: 30px;  margin-top:19px; margin-bottom:20px;margin-right:5px;"  tabindex="<%=String.valueOf(lineTab++) %>" />&nbsp;
 										</div>
 									</div>
-									<div class="box_2of3" id="productAbstract${status.index}" style="position:static; white-space: normal; height: 50px; vertical-align: middle; text-align: center;" >
+									
+									<div class="box_2of3" id="productAbstract${status.index}" style="position:static; white-space: normal; height: 65px; vertical-align: middle; text-align: center;" >
 										<c:out value="${lineDtoList.productAbstract}" />
-									</div>
-
-									<div class="box_3of3" style="height: 50px; vertical-align: middle; text-align: center;">
+									</div>						
+									<div class="box_3of3" style="height: 68px; vertical-align: middle; text-align: center;">
 									<html:textarea name="lineDtoList" indexed="true" styleId="lineDtoList[${status.index}].productRemarks" property="productRemarks"
-										style="width: 95%; height: 40px; margin: 5px;"  tabindex="<%=String.valueOf(lineTab++) %>" readonly="true" styleClass="c_disable"/>
+										style="width: 95%; height: 40px; margin-top: 15px;"  tabindex="<%=String.valueOf(lineTab++) %>" readonly="true" styleClass="c_disable"/>
 									</div>
 								</td>
 
-								<!-- 数量※/円単価※/外貨単価 -->
+								<!-- 数量※/円単価※/外貨単価/製造年月日※ -->
 								<td colspan="2" >
 									<div class="box_1of3" style="height: 50px;">
 										<div style="float:left; background-color: #fae4eb;">
@@ -992,7 +993,10 @@
 										<html:text name="lineDtoList" property="unitPrice" indexed="true" styleId="lineDtoList[${status.index}].unitPrice" styleClass="AutoCalcUnitPrice numeral_commas yen_value" style="width:45%; height: 30px; margin:10px 0 0 10px;" tabindex="<%=String.valueOf(lineTab++) %>" maxlength="9" />
 										<html:text name="lineDtoList" property="price" indexed="true" styleId="lineDtoList[${status.index}].price" styleClass="AutoCalcPrice numeral_commas yen_value" style="width:43%; height: 30px; margin:10px 10px 0;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
 									</div>
-									<div class="box_3of3" style="height: 50px;">
+									
+									<div class="box_2of3" style="height: 50px;">
+										
+										<!-- 
 										<c:choose>
 										<c:when test="${f:h(newData)}" >
 										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
@@ -1019,25 +1023,55 @@
 											</c:choose>
 										</c:otherwise>
 										</c:choose>
+										 -->
+										 
 										<html:hidden name="lineDtoList" property="dolUnitPrice" styleId="lineDtoList[${status.index}].dolUnitPrice" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" />
 										<html:hidden name="lineDtoList" property="dolPrice"  styleId="lineDtoList[${status.index}].dolPrice" styleClass="AutoCalcDolPrice numeral_commas dollar_value" style="width:43%; margin:10px 10px 0; height:30px;"  />
-									<!-- 
+									 
 										<html:text name="lineDtoList" property="dolUnitPrice" indexed="true" styleId="lineDtoList[${status.index}].dolUnitPrice" styleClass="AutoCalcDolUnitPrice numeral_commas dollar_value" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
 										<html:text name="lineDtoList" property="dolPrice" indexed="true" styleId="lineDtoList[${status.index}].dolPrice" styleClass="AutoCalcDolPrice numeral_commas dollar_value" style="width:43%; margin:10px 10px 0; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="9" />
-									 -->
+									 
 									</div>
+									<div class="box_3of3" style="height: 51px; background-color: #fae4eb;">
+									<c:choose>
+										<c:when test="${f:h(newData)}" >
+										<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+										</c:when>
+										<c:otherwise>
+											<html:checkbox name="lineDtoList" property="updateMadeDate" indexed="true" styleId="lineDtoList[${status.index}].updateMadeDate" tabindex="<%=String.valueOf(lineTab++) %>" style="width: 25px; height: 25px; vertical-align: middle;"  onclick="madeDateDisabledChanged('${status.index}')"/>
+											<c:choose>
+											<c:when test="${f:h(lineDtoList.updateMadeDate)}" >
+												<div style="display:inline" id="lineDtoList[${status.index}].madeDate_input_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+												</div>
+												<div style="display:none" id="lineDtoList[${status.index}].madeDate_disable_area">
+												<html:text name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												</div>
+											</c:when>
+											<c:otherwise>
+												<div style="display:none" id="lineDtoList[${status.index}].madeDate_input_area">
+												<html:text name="lineDtoList" property="madeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_input" styleClass="date_input" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="10"/>
+												</div>
+												<div style="display:inline" id="lineDtoList[${status.index}].madeDate_disable_area">
+												<html:text name="lineDtoList" property="oldMadeDate" indexed="true" styleId="lineDtoList[${status.index}].madeDate_disable" styleClass="c_disable" style="width:45%; height: 30px; margin:10px 0 0 10px; height:30px;" tabindex="<%=String.valueOf(lineTab++) %>"  maxlength="12" readonly="true"/>
+												</div>
+											</c:otherwise>
+											</c:choose>
+										</c:otherwise>
+										</c:choose>
+										</div>
 								</td>
 
 								<!-- 備考/倉庫名/棚番※ -->
 								<td>
-									<div class="box_1of3" style="height: 50px; vertical-align: middle; text-align: center;">
-										<html:textarea name="lineDtoList" property="remarks" indexed="true" styleId="lineDtoList[${status.index}].remarks" style="width: 95%; height: 40px; margin: 5px; ime-mode:active;" tabindex="<%=String.valueOf(lineTab++) %>" />
+									<div class="box_1of3" style="height: 68px; vertical-align: middle; text-align: center;">
+										<html:textarea name="lineDtoList" property="remarks" indexed="true" styleId="lineDtoList[${status.index}].remarks" style="width: 95%; height: 40px; margin-top: 15px; ime-mode:active;" tabindex="<%=String.valueOf(lineTab++) %>" />
 									</div>
-									<div class="box_2of3" style="height: 50px; vertical-align: middle; text-align: center;">
-										<html:text name="lineDtoList" property="warehouseName" indexed="true" styleId="lineDtoList[${status.index}].warehouseName" style="width: 95%; height: 40px; margin: 5px; ime-mode: disabled;"  readonly="true" styleClass="c_disable" tabindex="<%=String.valueOf(lineTab++) %>"  />
+									<div class="box_2of3" style="height: 68px; vertical-align: middle; text-align: center;">
+										<html:text name="lineDtoList" property="warehouseName" indexed="true" styleId="lineDtoList[${status.index}].warehouseName" style="width: 95%; height: 40px; margin-top: 14px; ime-mode: disabled;"  readonly="true" styleClass="c_disable" tabindex="<%=String.valueOf(lineTab++) %>"  />
 									</div>
-									<div class="box_3of3" style="height: 50px; background-color: #fae4eb;">
-										<html:text name="lineDtoList" property="rackCode" indexed="true" styleId="lineDtoList[${status.index}].rackCode" style="width: 80%; height: 30px; ime-mode: disabled; vertical-align: middle; margin:10px 0;"  tabindex="<%=String.valueOf(lineTab++) %>"
+									<div class="box_3of3" style="height: 66px; background-color: #fae4eb;">
+										<html:text name="lineDtoList" property="rackCode" indexed="true" styleId="lineDtoList[${status.index}].rackCode" style="width: 80%; height: 30px; ime-mode: disabled; vertical-align: middle; margin-top:17px;"  tabindex="<%=String.valueOf(lineTab++) %>"
 										onfocus="this.curVal=this.value;" onblur="if(this.curVal!=this.value){ changeRackCode(this); }" readonly="true" styleClass="c_disable"/>
 										<!-- 
 										<html:image src="${f:url('/images/customize/btn_search.png')}" styleId="rackCodeImg${status.index}" style="margin: 0; padding: 0; width: 26px; height: 26px; vertical-align: middle; cursor: pointer;" tabindex="<%=String.valueOf(lineTab++) %>" />
